@@ -10,7 +10,7 @@ namespace GrechMotorsPrd.Shared.Models
     {
         public int id { get; set; }
         public int piece_number { get; set; }
-        public int qrIdentificationCode { get; set; }
+        public string? qrIdentificationCode { get; set; }
         public string? piece_status { get; set; }
         public string? comments { get; set; }
         public DateTime created_at { get; set; } = DateTime.Now;

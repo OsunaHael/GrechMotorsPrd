@@ -17,18 +17,21 @@ namespace GrechMotorsPrd.Server.Controllers
             _context = context;
         }
 
+        // GET: api/Unit
         [HttpGet]
         public async Task<ActionResult<List<UnitModel>>> GetUnit()
         {
+            // Retrieve all units from the database
             var lista = await _context.units.ToListAsync();
             return Ok(lista);
         }
 
-
+        // GET: api/Unit/{id}
         [HttpGet]
         [Route("{id}")]
         public async Task<ActionResult<List<UnitModel>>> GetSingleUnit(int id)
         {
+            // Retrieve a single unit from the database based on the provided id
             var miobjeto = await _context.units.FirstOrDefaultAsync(ob => ob.id == id);
             if (miobjeto == null)
             {
@@ -37,17 +40,55 @@ namespace GrechMotorsPrd.Server.Controllers
             return Ok(miobjeto);
         }
 
-        [HttpPost]
-        public async Task<ActionResult<UnitModel>> CreateModel(UnitModel objeto)
+        // GET: api/Unit/getGnumber/{gnumber}
+        [HttpGet]
+        [Route("getGnumber/{gnumber}")]
+        public async Task<ActionResult<List<UnitModel>>> GetUnitByGnumber(int gnumber)
         {
-            _context.units.Add(objeto);
-            await _context.SaveChangesAsync();
-            return Ok(await GetDbModel());
+            // Retrieve a single unit from the database based on the provided id
+            var miobjeto = await _context.units.FirstOrDefaultAsync(ob => ob.g_number == gnumber);
+            if (miobjeto == null)
+            {
+                return NotFound(" :/");
+            }
+            return Ok(miobjeto);
         }
 
-        [HttpPut("{id}/gnumber")]
-        public async Task<ActionResult<List<UnitModel>>> UpdateModelGNumber(UnitModel objeto)
+        // GET: api/Unit/get/{model}
+        [HttpGet]
+        [Route("getModel/{model}")]
+        public async Task<ActionResult<List<UnitModel>>> GetUnitByModel(string model)
         {
+            // Retrieve all units from the database that match the provided model name
+            var units = await _context.units.Where(ob => ob.model == model).ToListAsync();
+            if (units == null || units.Count == 0)
+            {
+                return NotFound(" :/");
+            }
+            return Ok(units);
+        }
+
+        // POST: api/Unit
+        [HttpPost]
+        public async Task<ActionResult<UnitModel>> CreateUnit(UnitModel objeto)
+        {
+            // Agrega la unidad al contexto y guarda los cambios en la base de datos
+            _context.units.Add(objeto);
+            await _context.SaveChangesAsync();
+
+            // Después de guardar los cambios, el ID de la unidad se actualizará en el objeto 'objeto'
+            // Puedes acceder al ID recién asignado desde el objeto 'objeto'
+            int newUnitId = objeto.id;
+
+            // Puedes retornar el objeto con el ID asignado y el estado de la operación
+            return Ok(objeto);
+        }
+
+        // PUT: api/Unit/{id}/gnumber
+        [HttpPut("{id}/update/gnumber")]
+        public async Task<ActionResult<List<UnitModel>>> UpdateUnitGNumber(UnitModel objeto)
+        {
+            // Update the g_number property of a unit based on the provided id
             var DbObjeto = await _context.units.FindAsync(objeto.id);
             if (DbObjeto == null)
                 return BadRequest("no se encuentra");
@@ -57,9 +98,11 @@ namespace GrechMotorsPrd.Server.Controllers
             return Ok(await _context.units.ToListAsync());
         }
 
+        // PUT: api/Unit/{id}/userid
         [HttpPut("{id}/userid")]
-        public async Task<ActionResult<List<UnitModel>>> UpdateModelUserId(UnitModel objeto)
+        public async Task<ActionResult<List<UnitModel>>> UpdateUnitUserId(UnitModel objeto)
         {
+            // Update the user_id property of a unit based on the provided id
             var DbObjeto = await _context.units.FindAsync(objeto.id);
             if (DbObjeto == null)
                 return BadRequest("no se encuentra");
@@ -69,9 +112,11 @@ namespace GrechMotorsPrd.Server.Controllers
             return Ok(await _context.units.ToListAsync());
         }
 
+        // PUT: api/Unit/{id}/color
         [HttpPut("{id}/color")]
-        public async Task<ActionResult<List<UnitModel>>> UpdateModelColor(UnitModel objeto)
+        public async Task<ActionResult<List<UnitModel>>> UpdateUnitColor(UnitModel objeto)
         {
+            // Update the color property of a unit based on the provided id
             var DbObjeto = await _context.units.FindAsync(objeto.id);
             if (DbObjeto == null)
                 return BadRequest("no se encuentra");
@@ -81,9 +126,11 @@ namespace GrechMotorsPrd.Server.Controllers
             return Ok(await _context.units.ToListAsync());
         }
 
+        // PUT: api/Unit/{id}/ext
         [HttpPut("{id}/ext")]
-        public async Task<ActionResult<List<UnitModel>>> UpdateModelExtended(UnitModel objeto)
+        public async Task<ActionResult<List<UnitModel>>> UpdateUnitExtended(UnitModel objeto)
         {
+            // Update the ext property of a unit based on the provided id
             var DbObjeto = await _context.units.FindAsync(objeto.id);
             if (DbObjeto == null)
                 return BadRequest("no se encuentra");
@@ -93,9 +140,11 @@ namespace GrechMotorsPrd.Server.Controllers
             return Ok(await _context.units.ToListAsync());
         }
 
-        [HttpPut("{id}/model")]
-        public async Task<ActionResult<List<UnitModel>>> UpdateModel(UnitModel objeto)
+        // PUT: api/Unit/{id}/unit
+        [HttpPut("{id}/unit")]
+        public async Task<ActionResult<List<UnitModel>>> UpdateUnit(UnitModel objeto)
         {
+            // Update the model property of a unit based on the provided id
             var DbObjeto = await _context.units.FindAsync(objeto.id);
             if (DbObjeto == null)
                 return BadRequest("no se encuentra");
@@ -105,9 +154,11 @@ namespace GrechMotorsPrd.Server.Controllers
             return Ok(await _context.units.ToListAsync());
         }
 
+        // PUT: api/Unit/{id}/startdate
         [HttpPut("{id}/startdate")]
-        public async Task<ActionResult<List<UnitModel>>> UpdateModelStartDate(UnitModel objeto)
+        public async Task<ActionResult<List<UnitModel>>> UpdateUnitStartDate(UnitModel objeto)
         {
+            // Update the start_date property of a unit based on the provided id
             var DbObjeto = await _context.units.FindAsync(objeto.id);
             if (DbObjeto == null)
                 return BadRequest("no se encuentra");
@@ -117,9 +168,11 @@ namespace GrechMotorsPrd.Server.Controllers
             return Ok(await _context.units.ToListAsync());
         }
 
+        // PUT: api/Unit/{id}/enddate
         [HttpPut("{id}/enddate")]
-        public async Task<ActionResult<List<UnitModel>>> UpdateModelEndDate(UnitModel objeto)
+        public async Task<ActionResult<List<UnitModel>>> UpdateUnitEndDate(UnitModel objeto)
         {
+            // Update the end_date property of a unit based on the provided id
             var DbObjeto = await _context.units.FindAsync(objeto.id);
             if (DbObjeto == null)
                 return BadRequest("no se encuentra");
@@ -129,10 +182,12 @@ namespace GrechMotorsPrd.Server.Controllers
             return Ok(await _context.units.ToListAsync());
         }
 
+        // DELETE: api/Unit/{id}
         [HttpDelete]
         [Route("{id}")]
-        public async Task<ActionResult<List<UnitModel>>> DeleteModel(int id)
+        public async Task<ActionResult<List<UnitModel>>> DeleteUnit(int id)
         {
+            // Delete a unit from the database based on the provided id
             var DbObjeto = await _context.units.FirstOrDefaultAsync(Ob => Ob.id == id);
             if (DbObjeto == null)
             {
@@ -140,11 +195,11 @@ namespace GrechMotorsPrd.Server.Controllers
             }
             _context.units.Remove(DbObjeto);
             await _context.SaveChangesAsync();
-            return Ok(await GetDbModel());
+            return Ok(await GetDbUnit());
         }
 
-
-        private async Task<List<UnitModel>> GetDbModel()
+        // Helper method to retrieve all units from the database
+        private async Task<List<UnitModel>> GetDbUnit()
         {
             return await _context.units.ToListAsync();
         }
