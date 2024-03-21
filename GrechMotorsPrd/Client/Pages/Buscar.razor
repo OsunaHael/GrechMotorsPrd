@@ -1,0 +1,246 @@
+﻿@page "/buscar"
+@using GrechMotorsPrd.Shared.Models
+@inject HttpClient Http
+
+<PageTitle>Buscar</PageTitle>
+
+<div class="container vh-100 d-flex justify-content-center align-items-center">
+    <div class="col-lg-8 col-md-10 col-sm-12">
+        <div class="bg-white rounded-3 p-4 shadow-lg">
+            <h1>Buscar</h1>
+            <div class="m-3">
+                <EditForm Model="unit">
+                    <div class="row">
+                        <div class="col">
+                            <label for="Selector" class="form-label">Selecciona una opción</label>
+                            <InputSelect @bind-Value="selector" class="form-select" id="Selector">
+                                <option value="g_number" selected>G Number</option>
+                                <option value="model">Modelo</option>
+                            </InputSelect>
+                        </div>
+                        @if(selector == "g_number")
+                        {
+                            <div class="col">
+                                <label for="GNumber" class="form-label" id="GNumber">G Number</label>
+                                <div class="d-flex">
+                                    <InputNumber @bind-Value="unit.g_number" placeholder="Ingresa el G Number" class="form-control rounded-start"></InputNumber>
+                                    <button type="submit" class="btn btn-outline-light bg-primary rounded-end" @onclick="GetUnit">
+                                        <i class="fa fa-search">
+                                            <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.25 19.25L15.5 15.5M4.75 11C4.75 7.54822 7.54822 4.75 11 4.75C14.4518 4.75 17.25 7.54822 17.25 11C17.25 14.4518 14.4518 17.25 11 17.25C7.54822 17.25 4.75 14.4518 4.75 11Z"></path>
+                                            </svg>
+                                        </i>
+                                    </button>
+                                </div>
+                            </div>     
+                        }
+                        else if(selector == "model")
+                        {
+                            <div class="col">
+                                <label for="Modelo" class="form-label" id="GNumber">Modelo</label>
+                                <div class="d-flex">
+                                    <InputText @bind-Value="unit.model" placeholder="Ingresa el modelo de la unidad" id="Modelo" class="form-control rounded-start"></InputText>
+                                    <button type="submit" class="btn btn-outline-light bg-primary rounded-end" @onclick="GetUnit">
+                                        <i class="fa fa-search">
+                                            <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.25 19.25L15.5 15.5M4.75 11C4.75 7.54822 7.54822 4.75 11 4.75C14.4518 4.75 17.25 7.54822 17.25 11C17.25 14.4518 14.4518 17.25 11 17.25C7.54822 17.25 4.75 14.4518 4.75 11Z"></path>
+                                            </svg>
+                                        </i>
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                    </div>                    
+                    <div class="row mt-3">
+                        <div class="col">
+                            @if(selectorIsGNumberSuccess)
+                            {
+                                <div class="table-responsive">
+                                    <table class="table" style="overflow-x: auto;">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-nowrap align-middle text-center">G Number</th>
+                                                <th class="text-nowrap align-middle text-center">Modelo</th>
+                                                <th class="text-nowrap align-middle text-center">Extended</th>
+                                                <th class="text-nowrap align-middle text-center">Color</th>
+                                                <th class="text-nowrap align-middle text-center">Opcion</th>
+                                                <th class="text-nowrap align-middle text-center">Linea</th>
+                                                <th class="text-nowrap align-middle text-center">Fecha de corte</th>
+                                                <th class="text-nowrap align-middle text-center">Fecha de creacion</th>
+                                                <th class="text-nowrap align-middle text-center">Fecha de modificacion</th>
+                                                <th class="text-nowrap align-middle text-center">Fecha de Inicio</th>
+                                                <th class="text-nowrap align-middle text-center">Fecha de Finalizacion</th>
+                                                <th class="text-nowrap align-middle text-center">Numero de usuario</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td class="text-nowrap align-middle text-center">@unit.g_number</td>
+                                                <td class="text-nowrap align-middle text-center">@unit.model</td>
+                                                @if (unit.ext == 1)
+                                                {
+                                                    <td class="text-nowrap text-center">Si</td>
+                                                }
+                                                else if (unit.ext == 0)
+                                                {
+                                                    <td class="text-nowrap text-center">No</td>
+                                                }
+                                                <td class="text-nowrap align-middle text-center">@unit.color</td>
+                                                <td class="text-nowrap align-middle text-center">@unit.opt</td>
+                                                <td class="text-nowrap align-middle text-center">@unit.line</td>
+                                                <td class="text-nowrap align-middle text-center">@unit.cut_off_date.ToString("dd/MM/yyyy")</td>
+                                                <td class="text-nowrap align-middle text-center">@unit.created_at.ToString("dd/MM/yyyy")</td>
+                                                <td class="text-nowrap align-middle text-center">@unit.updated_at.ToString("dd/MM/yyyy")</td>
+                                                <td class="text-nowrap align-middle text-center">@unit.start_date.ToString("dd/MM/yyyy")</td>
+                                                <td class="text-nowrap align-middle text-center">@unit.end_date.ToString("dd/MM/yyyy")</td>
+                                                <td class="text-nowrap align-middle text-center">@unit.user_id</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+                            else if(selectorIsModelSuccess)
+                            {
+                                <div style="max-height: 60vh; overflow-y: auto;">
+                                    <div class="table-responsive">
+                                        <table class="table justify-content-center" style="overflow-x: auto;">
+                                            <thead>
+                                                <tr>
+                                                    <th class="text-nowrap align-middle text-center">G Number</th>
+                                                    <th class="text-nowrap align-middle text-center">Modelo</th>
+                                                    <th class="text-nowrap align-middle text-center">Extended</th>
+                                                    <th class="text-nowrap align-middle text-center">Color</th>
+                                                    <th class="text-nowrap align-middle text-center">Opcion</th>
+                                                    <th class="text-nowrap align-middle text-center">Linea</th>
+                                                    <th class="text-nowrap align-middle text-center">Fecha de corte</th>
+                                                    <th class="text-nowrap align-middle text-center">Fecha de creacion</th>
+                                                    <th class="text-nowrap align-middle text-center">Fecha de modificacion</th>
+                                                    <th class="text-nowrap align-middle text-center">Fecha de Inicio</th>
+                                                    <th class="text-nowrap align-middle text-center">Fecha de Finalizacion</th>
+                                                    <th class="text-nowrap align-middle text-center">Numero de usuario</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var unit in readUnitJson)
+                                                {
+                                                    <tr>
+                                                        <td class="text-nowrap align-middle text-center">@unit.g_number</td>
+                                                        <td class="text-nowrap align-middle text-center">@unit.model</td>
+                                                        @if (unit.ext == 1)
+                                                        {
+                                                            <td class="text-nowrap text-center">Si</td>
+                                                        }
+                                                        else if (unit.ext == 0)
+                                                        {
+                                                            <td class="text-nowrap text-center">No</td>
+                                                        }
+                                                        <td class="text-nowrap align-middle text-center">@unit.color</td>
+                                                        <td class="text-nowrap align-middle text-center">@unit.opt</td>
+                                                        <td class="text-nowrap align-middle text-center">@unit.line</td>
+                                                        <td class="text-nowrap align-middle text-center">@unit.cut_off_date.ToString("dd/MM/yyyy")</td>
+                                                        <td class="text-nowrap align-middle text-center">@unit.created_at.ToString("dd/MM/yyyy")</td>
+                                                        <td class="text-nowrap align-middle text-center">@unit.updated_at.ToString("dd/MM/yyyy")</td>
+                                                        <td class="text-nowrap align-middle text-center">@unit.start_date.ToString("dd/MM/yyyy")</td>
+                                                        <td class="text-nowrap align-middle text-center">@unit.end_date.ToString("dd/MM/yyyy")</td>
+                                                        <td class="text-nowrap align-middle text-center">@unit.user_id</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            }
+                            else if(showErrorMessage)
+                            {
+                                <div class="alert alert-danger" role="alert">
+                                    <strong>Se encontró un error al buscar la unidad</strong>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    UnitModel unit = new UnitModel();
+    List<UnitModel> readUnitJson = new List<UnitModel>();
+    HttpResponseMessage response = new HttpResponseMessage();
+
+    string selector = String.Empty;
+    bool showConfirmationMessage = false;
+    bool showErrorMessage = false;
+    bool selectorIsGNumberSuccess = false;
+    bool selectorIsModelSuccess = false;
+    
+    private async Task GetUnit()
+    {
+        if (selector == "g_number")
+        {
+            // Construye la URL de la solicitud GET con el valor de g_number
+            string url = $"api/Unit/getGnumber/{unit.g_number}";
+
+            // Realiza la solicitud GET utilizando HttpClient
+            response = await Http.GetAsync(url);
+
+            // Verifica si la solicitud fue exitosa (código de estado 200)
+            if (response.IsSuccessStatusCode)
+            {
+                // Lee la respuesta como una cadena de texto
+                unit = await response.Content.ReadFromJsonAsync<UnitModel>();
+
+                // Aquí puedes procesar la respuesta y mostrar los resultados en tu página
+                showConfirmationMessage = true;
+                selectorIsModelSuccess = false;
+                selectorIsGNumberSuccess = true;                
+                StateHasChanged();
+                await Task.Delay(3000);
+                showConfirmationMessage = false;
+            }
+            else
+            {
+                // Maneja el caso en el que la solicitud no fue exitosa
+                // Puedes mostrar un mensaje de error o realizar alguna otra acción
+                showErrorMessage = true;
+                StateHasChanged();
+                await Task.Delay(3000);
+                showErrorMessage = false;
+            }
+        }
+        else if (selector == "model")
+        {
+            // Construye la URL de la solicitud GET con el valor de model
+            string url = $"api/Unit/getModel/{unit.model}";
+
+            // Realiza la solicitud GET utilizando HttpClient
+            response = await Http.GetAsync(url);
+
+            // Verifica si la solicitud fue exitosa (código de estado 200)
+            if (response.IsSuccessStatusCode)
+            {
+                // Lee la respuesta como una cadena de texto
+                readUnitJson = await response.Content.ReadFromJsonAsync<List<UnitModel>>();
+
+                // Aquí puedes procesar la respuesta y mostrar los resultados en tu página
+                showConfirmationMessage = true;
+                selectorIsGNumberSuccess = false;
+                selectorIsModelSuccess = true;
+                StateHasChanged();
+                await Task.Delay(3000);
+                showConfirmationMessage = false;
+            }
+            else
+            {
+                // Maneja el caso en el que la solicitud no fue exitosa
+                // Puedes mostrar un mensaje de error o realizar alguna otra acción
+                showErrorMessage = true;
+                StateHasChanged();
+                await Task.Delay(3000);
+                showErrorMessage = false;
+            }
+        }
+    }
+}

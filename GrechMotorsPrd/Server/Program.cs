@@ -1,5 +1,8 @@
 using GrechMotorsPrd.Server.Data;
-using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
