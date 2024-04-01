@@ -1,115 +1,156 @@
 ﻿@page "/inputdata"
 @using GrechMotorsPrd.Shared.Models
+@using Newtonsoft.Json;
+@using System.Collections.Concurrent
+
 @inject HttpClient Http
+@inject IJSRuntime JSRuntime
 
 <PageTitle>Input Data</PageTitle>
 
-<div class="container vh-100 d-flex justify-content-center align-items-center mb-3">
-    <div class="col-lg-8 col-md-10 col-sm-12">
-        <div class="bg-white rounded-3 p-4 shadow-lg">
-            <h1>Input Data</h1>
-            <div class="m-3">
-                <EditForm Model="newUnit">
-                    <div class="row m-3">
-                        <div class="col">
-                            <label for="gNumber" class="form-label">G Number</label>
-                            <InputNumber @bind-Value="newUnit.g_number" id="gNumber" class="form-control" placeholder="G_Number" aria-label="G_Number"></InputNumber>
+    <div class="container vh-100 d-flex justify-content-center align-items-center mb-3">
+        <div class="col-lg-8 col-md-10 col-sm-12">
+            <div class="bg-white rounded-3 p-4 shadow-lg">
+                <h1>Input Data</h1>
+                <div class="m-3">
+                    <EditForm Model="newUnit">
+                        <div class="row m-3">
+                            <div class="col">
+                                <label for="gNumber" class="form-label">G Number</label>
+                                <InputNumber @bind-Value="newUnit.g_number" id="gNumber" class="form-control" placeholder="G_Number" aria-label="G_Number"></InputNumber>
+                            </div>
+                            <div class="col">
+                                <label for="Modelo" class="form-label">Modelo</label>
+                                <InputSelect @bind-Value="newUnit.model" id="Modelo" class="form-select">
+                                    <option value="null" selected></option>
+                                    <option value="Tour 144">Tour 144</option>
+                                    <option value="Tour 170">Tour 170</option>
+                                    <option value="Lounge">Lounge</option>
+                                </InputSelect>
+                            </div>
                         </div>
-                        <div class="col">
-                            <label for="Modelo" class="form-label">Modelo</label>
-                            <InputSelect @bind-Value="newUnit.model" id="Modelo" class="form-select">
-                                <option value="null" selected></option>
-                                <option value="Tour 144">Tour 144</option>
-                                <option value="Tour 170">Tour 170</option>
-                                <option value="Lounge">Lounge</option>
-                            </InputSelect>
+                        <div class="row m-3">
+                            <div class="col">
+                                <label for="Color" class="form-label">Color</label>
+                                <InputSelect @bind-Value="newUnit.color" id="Color" class="form-select">
+                                    <option value="null" selected></option>
+                                    <option value="Claro">Claro</option>
+                                    <option value="Oscuro">Oscuro</option>
+                                </InputSelect>
+                            </div>
+                            <div class="col">
+                                <label for="Opcion" class="form-label">Opcion</label>
+                                <InputSelect @bind-Value="newUnit.opt" id="Opcion" class="form-select">
+                                    <option value="null" selected></option>
+                                    <option value="Estandar">Estandar</option>
+                                    <option value="Twin Bed">Twin Bed</option>
+                                </InputSelect>
+                            </div>
                         </div>
-                    </div>
-                    <div class="row m-3">
-                        <div class="col">
-                            <label for="Color" class="form-label">Color</label>
-                            <InputSelect @bind-Value="newUnit.color" id="Color" class="form-select">
-                                <option value="null" selected></option>
-                                <option value="Claro">Claro</option>
-                                <option value="Oscuro">Oscuro</option>
-                            </InputSelect>
+                        <div class="row m-3">
+                            <div class="col">
+                                <label for="Ext" class="form-label">Extendida</label>
+                                <InputSelect @bind-Value="newUnit.ext" id="Ext" class="form-select">
+                                    <option value="null" selected></option>
+                                    <option value="1">Si</option>
+                                    <option value="0">No</option>
+                                </InputSelect>
+                            </div>
+                            <div class="col">
+                                <label for="fechaCorte" class="form-label">Fecha de Corte</label>
+                                <InputDate @bind-Value="newUnit.cut_off_date" id="fechaCorte" class="form-control" />
+                            </div>
                         </div>
-                        <div class="col">
-                            <label for="Opcion" class="form-label">Opcion</label>
-                            <InputSelect @bind-Value="newUnit.opt" id="Opcion" class="form-select">
-                                <option value="null" selected></option>
-                                <option value="Estandar">Estandar</option>
-                                <option value="Twin Bed">Twin Bed</option>
-                            </InputSelect>
+                        <div class="row m-3">
+                            <div class="col">
+                                <label for="Linea" class="form-label">Linea</label>
+                                <InputSelect @bind-Value="newUnit.line" id="Linea" class="form-select">
+                                    <option value="null" selected></option>
+                                    <option value="1">RV 1</option>
+                                    <option value="2">RV 2</option>
+                                    <option value="3">Linea A</option>
+                                    <option value="4">Linea B</option>
+                                </InputSelect>
+                            </div>
+                            <div class="col">
+                                <label for="userid" class="form-label">User ID</label>
+                                <InputNumber @bind-Value="newUnit.user_id" id="userid" class="form-control" placeholder="User ID" aria-label="UserId"></InputNumber>
+                            </div>
+                            <div class="col d-flex justify-content-start py-3 mt-3">
+                                <button class="btn btn-success" @onclick="(() => CreateUnit(newUnit))">Crear Unidad</button>
+                            </div>
+                            @* @if (showDownloadButton)
+                            {
+                                <div class="col d-flex justify-conten-start py-3 mt-3">
+                                <button class="btn btn-primary" @onclick="DownloadZip">Download QR Codes</button>
+                                </div>
+                            } *@
                         </div>
-                    </div>
-                    <div class="row m-3">
-                        <div class="col">
-                            <label for="Ext" class="form-label">Extendida</label>
-                            <InputSelect @bind-Value="newUnit.ext" id="Ext" class="form-select">
-                                <option value="null" selected></option>
-                                <option value="1">Si</option>
-                                <option value="0">No</option>
-                            </InputSelect>
-                        </div>
-                        <div class="col">
-                            <label for="fechaCorte" class="form-label">Fecha de Corte</label>
-                            <InputDate @bind-Value="newUnit.cut_off_date" id="fechaCorte" class="form-control" />
-                        </div>
-                    </div>
-                    <div class="row m-3">
-                        <div class="col">
-                            <label for="Linea" class="form-label">Linea</label>
-                            <InputSelect @bind-Value="newUnit.line" id="Linea" class="form-select">
-                                <option value="null" selected></option>
-                                <option value="1">RV 1</option>
-                                <option value="2">RV 2</option>
-                                <option value="3">Linea A</option>
-                                <option value="4">Linea B</option>
-                            </InputSelect>
-                        </div>
-                        <div class="col">
-                            <label for="userid" class="form-label">User ID</label>
-                            <InputNumber @bind-Value="newUnit.user_id" id="userid" class="form-control" placeholder="User ID" aria-label="UserId"></InputNumber>
-                        </div>
-                        <div class="col d-flex justify-content-start py-3 mt-3">
-                            <button class="btn btn-success" @onclick="(() => CreateUnit(newUnit))">Crear Unidad</button>
-                        </div>
-                    </div>
-                    @if (showConfirmationMessage)
-                    {
-                        <div class="alert alert-success" role="alert">
-                            <strong>La unidad se creo correctamente!</strong>
-                        </div>
-                    }
-                    else if(showErrorMessage)
-                    {
-                        <div class="alert alert-danger" role="alert">
-                            <strong>Hubo un error al crear la unidad!</strong>
-                        </div>
-                    }
-                </EditForm>
+                        @if (showConfirmationMessage)
+                        {
+                            <div class="alert alert-success" role="alert">
+                                <strong>La unidad se creo correctamente!</strong>
+                            </div>
+                        }
+                        else if(showErrorMessage)
+                        {
+                            <div class="alert alert-danger" role="alert">
+                                <strong>Hubo un error al crear la unidad!</strong>
+                            </div>
+                        }
+                    </EditForm>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-@code {
+@code 
+{
+    // Declaración e inicialización de listas y variables para almacenar información relacionada con los muebles y las piezas de la unidad
+    HashSet<int> furnitureIds = new HashSet<int>(); // Cambia List<int> a HashSet<int>
+    List<List<int>> piecesIds = new List<List<int>>(); // Lista para almacenar las listas de identificadores de las piezas
+    List<FurnitureModel> furnituresM = new List<FurnitureModel>(); // Lista para almacenar los modelos de los muebles de la unidad
+    List<PieceModel> piecesM = new List<PieceModel>(); // Lista para almacenar los modelos de las piezas de la unidad
+
     UnitModel newUnit = new UnitModel();
 
     bool showConfirmationMessage = false;
     bool showErrorMessage = false;
-    
+    //bool showDownloadButton = false;
 
+    // Método asincróno para crear una nueva unidad
     public async Task CreateUnit(UnitModel myUnit)
     {
+
         var resultCreateModel = await Http.PostAsJsonAsync("api/Unit", myUnit);
+
         if (resultCreateModel.IsSuccessStatusCode)
         {
             var createdUnit = await resultCreateModel.Content.ReadFromJsonAsync<UnitModel>();
-            if(createdUnit != null)
+
+            if (createdUnit != null)
             {
                 await AddUnitFurnitures(createdUnit);
+                var unorderedFurnitureIds = await GetAsyncList<int>($"api/UnitFurniture/getFurnituresByUnit/{createdUnit.id}");
+                var orderedFurnitureIds = unorderedFurnitureIds.OrderBy(id => id);
+                furnitureIds.UnionWith(orderedFurnitureIds); // Usa UnionWith en lugar de AddRange
+                
+                // Obtén los datos de la tabla FurniturePieces
+                var furniturePieces = await GetAsyncList<FurniturePieceModel>("api/FurniturePiece");
+
+                var furniturePiecesTasks = furnitureIds.Select(id => GetAsyncList<int>($"api/FurniturePiece/getPiecesByFurnitureId/{id}"));
+                piecesIds = (await Task.WhenAll(furniturePiecesTasks)).ToList();
+
+                var pieceModelsTasks = piecesIds.SelectMany(id => id).Select(id => GetAsyncJson<PieceModel>($"api/Piece/getPieceById/{id}"));
+                piecesM = (await Task.WhenAll(pieceModelsTasks)).ToList();
+
+                var furnitureModelsTasks = furnitureIds.Select(id => GetAsyncJson<FurnitureModel>($"api/Furniture/getFurnitureById/{id}"));
+                furnituresM = (await Task.WhenAll(furnitureModelsTasks)).ToList();
+
+                var furnitureCodes = GenerateFurnitureCodes(createdUnit, furnituresM);
+                var pieceCodes = GeneratePieceCodes(createdUnit, furnituresM, piecesM, piecesIds);
+                await AddFurnitureCodes(furnitureCodes, furnituresM, createdUnit);
+                await AddPieceCodes(pieceCodes, furnituresM, piecesM, createdUnit, furniturePieces);
             }
         }
     }
@@ -118,49 +159,237 @@
     {
         try
         {
-            if (myUnit.model == "Tour 170" && myUnit.ext == 1)
+            if (myUnit.model == "Lounge" && myUnit.ext == 1)
             {
-                for (int i = 2; i <= 12; i++)
-                {
-                    var unitFurniture = new UnitFurnitureModel
+                var tasks = Enumerable.Range(1, 17).Select(i =>
+                    Http.PostAsJsonAsync("api/UnitFurniture", new UnitFurnitureModel
                         {
                             unit_id = myUnit.id,
                             furniture_id = i
+                        }));
+
+                var responses = await Task.WhenAll(tasks);
+
+                var allSuccessful = responses.All(response => response.IsSuccessStatusCode);
+
+                // Update the UI accordingly
+                showConfirmationMessage = allSuccessful;
+                showErrorMessage = !allSuccessful;
+                newUnit = new UnitModel();
+                StateHasChanged();
+
+                // Reset the messages
+                showConfirmationMessage = false;
+                showErrorMessage = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            // Handle exceptions
+            Console.WriteLine($"An error occurred: {ex.Message}");
+            throw new Exception("An error occurred while adding unit furnitures.", ex);
+        }
+    }
+
+    public Queue<string> GenerateFurnitureCodes(UnitModel unit, List<FurnitureModel> furnituresM)
+    {
+        var identificationCodes = new Queue<string>();
+
+        foreach (var furniture in furnituresM)
+        {
+            var identificationCode = $"{unit.cut_off_date.ToString("ddMMyy")}{unit.line}{furniture.furniture_number}";
+            identificationCodes.Enqueue(identificationCode);
+        }
+
+        return identificationCodes;
+    }
+
+    public Queue<string> GeneratePieceCodes(UnitModel unit, List<FurnitureModel> furnituresM, List<PieceModel> piecesM, List<List<int>> piecesIds)
+    {
+        var identificationCodes = new Queue<string>();
+
+        for (int i = 0; i < furnituresM.Count; i++)
+        {
+            var furniture = furnituresM[i];
+            var relatedPieceIds = piecesIds[i];
+
+            foreach (var id in relatedPieceIds)
+            {
+                var piece = piecesM.First(piece => piece.id == id);
+                var identificationCode = $"{unit.cut_off_date.ToString("ddMMyy")}{unit.line}{furniture.furniture_number}{piece.piece_number}";
+                identificationCodes.Enqueue(identificationCode);
+            }
+        }
+
+        return identificationCodes;
+    }
+
+    public async Task AddFurnitureCodes(Queue<string> furnitureCodes, List<FurnitureModel> furnitureM, UnitModel unit)
+    {
+        try
+        {
+            var tasks = new List<Task<HttpResponseMessage>>();
+
+            foreach (var furniture in furnitureM)
+            {
+                if (furnitureCodes.Count > 0)
+                {
+                    var unitFurnitureCode = new UnitFurnitureCodeModel
+                        {
+                            unit_id = unit.id,
+                            furniture_id = furniture.id,
+                            qr_code_number = furnitureCodes.Peek() // Usa Peek() en lugar de Dequeue()
                         };
 
-                    var response = await Http.PostAsJsonAsync("api/UnitFurniture", unitFurniture);
-                    if (response.IsSuccessStatusCode)
-                    {
-                        // Handle success
-                        // Update the UI accordingly
-                        showConfirmationMessage = true;
-                        newUnit = new UnitModel();
-                        StateHasChanged();
-                        await Task.Delay(3000);
-                        showConfirmationMessage = false;
-                    }
-                    else
-                    {
-                        // Handle failure
-                        // Update the UI accordingly
-                        showErrorMessage = true;
-                        newUnit = new UnitModel();
-                        StateHasChanged();
-                        await Task.Delay(3000);
-                        showErrorMessage = false;
-                    }
+                    tasks.Add(Http.PostAsJsonAsync("api/UnitFurnitureCode", unitFurnitureCode));
+
+                    // Desencola el código después de usarlo
+                    furnitureCodes.Dequeue();
+                }
+            }
+
+            var responses = await Task.WhenAll(tasks);
+
+            foreach (var response in responses)
+            {
+                if (response.IsSuccessStatusCode)
+                {
+                    // Handle success
+                    // Update the UI accordingly
+                    showConfirmationMessage = true;
+                    newUnit = new UnitModel();
+                    StateHasChanged();
+                    showConfirmationMessage = false;
+                }
+                else
+                {
+                    // Handle failure
+                    // Update the UI accordingly
+                    showErrorMessage = true;
+                    newUnit = new UnitModel();
+                    StateHasChanged();
+                    showErrorMessage = false;
                 }
             }
         }
         catch (Exception ex)
         {
             // Handle exceptions
-            // Aquí se capturan y manejan excepciones que puedan ocurrir durante la ejecución del código anterior
-            // Por ejemplo, se puede registrar la excepción, notificar al usuario o realizar alguna acción de recuperación
-            // Dependiendo del caso y de los requisitos del sistema
             Console.WriteLine($"An error occurred: {ex.Message}");
-            // También se puede lanzar una nueva excepción si es necesario propagar el error
-            throw new Exception("An error occurred while adding unit furnitures.", ex);
+            throw new Exception("An error occurred while adding the furniture codes.", ex);
+        }
+    }
+
+    public async Task AddPieceCodes(Queue<string> pieceCodes, List<FurnitureModel> furnitureM, List<PieceModel> pieceM, UnitModel unit, List<FurniturePieceModel> furniturePieces)
+    {
+        try
+        {
+            var tasks = new List<Task<HttpResponseMessage>>();
+
+            foreach (var furniture in furnitureM)
+            {
+                var correspondingPieceIds = furniturePieces.Where(fp => fp.furniture_id == furniture.id).Select(fp => fp.piece_id);
+                var correspondingPieces = correspondingPieceIds.Select(id => pieceM.First(piece => piece.id == id));
+
+
+                var pieceTasks = correspondingPieces.Select(piece =>
+                {
+                    if (pieceCodes.Count > 0)
+                    {
+                        var unitPieceCode = new UnitPieceCodeModel
+                            {
+                                unit_id = unit.id,
+                                piece_id = piece.id,
+                                qr_code_number = pieceCodes.Peek() // Usa Peek() en lugar de Dequeue()
+                            };
+
+                        // Desencola el código después de usarlo
+                        pieceCodes.Dequeue();
+
+                        return Http.PostAsJsonAsync("api/UnitPieceCode", unitPieceCode);
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }).Where(task => task != null);
+
+                tasks.AddRange(pieceTasks);
+            }
+
+            var responses = await Task.WhenAll(tasks);
+
+            foreach (var response in responses)
+            {
+                if (response.IsSuccessStatusCode)
+                {
+                    // Handle success
+                    // Update the UI accordingly
+                    showConfirmationMessage = true;
+                    newUnit = new UnitModel();
+                    StateHasChanged();
+                    showConfirmationMessage = false;
+                }
+                else
+                {
+                    // Handle failure
+                    // Update the UI accordingly
+                    showErrorMessage = true;
+                    newUnit = new UnitModel();
+                    StateHasChanged();
+                    showErrorMessage = false;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            // Handle exceptions
+            Console.WriteLine($"An error occurred: {ex.Message}");
+            throw new Exception("An error occurred while adding the piece codes.", ex);
+        }
+    }
+
+    public async Task<T> GetAsyncJson<T>(string url)
+    {
+        var response = await Http.GetAsync(url);
+        if (response.IsSuccessStatusCode)
+        {
+            return await response.Content.ReadFromJsonAsync<T>();
+        }
+        else
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            throw new Exception($"Failed to get data from {url}. Status code: {response.StatusCode}. Response content: {content}");
+        }
+    }
+
+    public async Task<List<T>> GetAsyncList<T>(string url)
+    {
+        var response = await Http.GetAsync(url);
+        if (response.IsSuccessStatusCode)
+        {
+            var json = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<List<T>>(json);
+        }
+        else
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            throw new Exception($"Failed to get data from {url}. Status code: {response.StatusCode}. Response content: {content}");
+        }
+    }
+
+    public async Task<int> GetAsyncInt(string url)
+    {
+        var response = await Http.GetAsync(url);
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            return int.Parse(content);
+        }
+        else
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            throw new Exception($"Failed to get data from {url}. Status code: {response.StatusCode}. Response content: {content}");
         }
     }
 }

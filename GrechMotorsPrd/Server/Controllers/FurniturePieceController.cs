@@ -36,6 +36,48 @@ namespace GrechMotorsPrd.Server.Controllers
             return Ok(miobjeto);
         }
 
+        [HttpGet]
+        [Route("getPieceByFurniture/{furniture_id}")]
+        public async Task<ActionResult<List<FurniturePieceModel>>> GetPieceByFurniture(int furniture_id)
+        {
+            var miobjeto = await _context.furniturespieces.FirstOrDefaultAsync(ob => ob.id == furniture_id);
+            if (miobjeto == null)
+            {
+                return NotFound(" :/");
+            }
+            return Ok(miobjeto);
+        }
+        
+        [HttpGet]
+        [Route("getPieceIdByFurniture/{furniture_id}")]
+        public async Task<ActionResult<int>> GetPieceIdByFurniture(int furniture_id)
+        {
+            var miobjeto = await _context.furniturespieces.FirstOrDefaultAsync(ob => ob.id == furniture_id);
+            if (miobjeto == null)
+            {
+                return NotFound(" :/");
+            }
+            return Ok(miobjeto.piece_id);
+        }
+
+        // GET: api/FurniturePiece/getPiecesByFurnitureId/{id}
+        [HttpGet]
+        [Route("getPiecesByFurnitureId/{furniture_id}")]
+        public async Task<ActionResult<List<int>>> GetPiecesByFurnitureId(int furniture_id)
+        {
+            var furniturePieces = await _context.furniturespieces
+                .Where(ob => ob.furniture_id == furniture_id)
+                .Select(ob => ob.piece_id)
+                .ToListAsync();
+
+            if (furniturePieces.Count == 0)
+            {
+                return NotFound(" :/");
+            }
+
+            return Ok(furniturePieces);
+        }
+
         [HttpPost]
         public async Task<ActionResult<FurniturePieceModel>> CreateFurniturePiece(FurniturePieceModel objeto)
         {

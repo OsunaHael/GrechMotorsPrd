@@ -22,6 +22,8 @@ namespace GrechMotorsPrd.Server.Data
         public DbSet<UnitFurnitureModel> unitsfurnitures { get; set; } // DbSet para el modelo UnitFurnitureModel
         public DbSet<UserPieceModel> userspieces { get; set; } // DbSet para el modelo UserPieceModel
         public DbSet<UserFurnitureModel> usersfurnitures { get; set; } // DbSet para el modelo UserFurnitureModel
+        public DbSet<UnitPieceCodeModel> unitspiecescodes { get; set; } // DbSet para el modelo UnitsPiecesCodesModel
+        public DbSet<UnitFurnitureCodeModel> unitsfurniturescodes { get; set; } // DbSet para el modelo UnitsFurnituresCodesModel
 
         // Método para configurar las relaciones de las entidades en la base de datos
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -92,6 +94,34 @@ namespace GrechMotorsPrd.Server.Data
                 .HasOne(uf => uf.Furniture) // Una relación unidad tiene un mueble
                 .WithMany(f => f.UnitFurnitures) // Un mueble tiene muchas relaciones unidad-mueble
                 .HasForeignKey(uf => uf.furniture_id); // Clave foránea de mueble es furniture_id
+
+            //Relacion muchos a muchos entre UnitModel y PieceModel a través de UnitPieceCodeModel
+            modelBuilder.Entity<UnitPieceCodeModel>()
+                .HasKey(upc => new { upc.unit_id, upc.piece_id }); // Definir clave compuesta
+            
+            modelBuilder.Entity<UnitPieceCodeModel>()
+                .HasOne(upc => upc.Unit) // Una relación unidad tiene una unidad
+                .WithMany(u => u.UnitPiecesCodes) // Una unidad tiene muchas relaciones unidad-pieza
+                .HasForeignKey(upc => upc.unit_id); // Clave foránea de unidad es unit_id
+            
+            modelBuilder.Entity<UnitPieceCodeModel>()
+                .HasOne(upc => upc.Piece) // Una relación unidad tiene una pieza
+                .WithMany(p => p.UnitPiecesCodes) // Una pieza tiene muchas relaciones unidad-pieza
+                .HasForeignKey(upc => upc.piece_id); // Clave foránea de pieza es piece_id
+
+            //Relacion muchos a muchos entre UnitModel y FurnitureModel a través de UnitFurnitureCodeModel
+            modelBuilder.Entity<UnitFurnitureCodeModel>()
+                .HasKey(ufc => new { ufc.unit_id, ufc.furniture_id }); // Definir clave compuesta
+
+            modelBuilder.Entity<UnitFurnitureCodeModel>()
+                .HasOne(ufc => ufc.Unit) // Una relación unidad tiene una unidad
+                .WithMany(u => u.UnitFurnituresCodes) // Una unidad tiene muchas relaciones unidad-mueble
+                .HasForeignKey(ufc => ufc.unit_id); // Clave foránea de unidad es unit_id
+
+            modelBuilder.Entity<UnitFurnitureCodeModel>()
+                .HasOne(ufc => ufc.Furniture) // Una relación unidad tiene un mueble
+                .WithMany(f => f.UnitFurnituresCodes) // Un mueble tiene muchas relaciones unidad-mueble
+                .HasForeignKey(ufc => ufc.furniture_id); // Clave foránea de mueble es furniture_id
         }
     }
 }
