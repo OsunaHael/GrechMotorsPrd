@@ -25,7 +25,7 @@ namespace GrechMotorsPrd.Server.Controllers
         }
 
         [HttpGet]
-        [Route("{id}")]
+        [Route("getPieceById/{id}")]
         public async Task<ActionResult<List<PieceModel>>> GetPieceById(int id)
         {
             var miobjeto = await _context.pieces.FirstOrDefaultAsync(ob => ob.id == id);
@@ -34,6 +34,20 @@ namespace GrechMotorsPrd.Server.Controllers
                 return NotFound(" :/");
             }
             return Ok(miobjeto);
+        }
+
+        // GET: api/FurniturePiece/getPiecesByFurnitures/{id}
+        [HttpGet]
+        [Route("getPiecesById/{id}")]
+        public async Task<ActionResult<List<FurniturePieceModel>>> GetPiecesById(int id)
+        {
+            // Retrieve all units from the database that match the provided model name
+            var pieces = await _context.pieces.Where(ob => ob.id == id).ToListAsync();
+            if (pieces == null || pieces.Count == 0)
+            {
+                return NotFound(" :/");
+            }
+            return Ok(pieces);
         }
 
         [HttpPost]

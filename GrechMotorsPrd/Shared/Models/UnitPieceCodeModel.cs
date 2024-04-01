@@ -1,0 +1,19 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace GrechMotorsPrd.Shared.Models
+{
+    public class UnitPieceCodeModel
+    {
+        public int id { get; set; }
+        public int unit_id { get; set; }
+        public int piece_id { get; set; }
+        public string? qr_code_number { get; set; }
+
+        public UnitModel? Unit { get; set; }
+        public PieceModel? Piece { get; set; }
+    }
+}

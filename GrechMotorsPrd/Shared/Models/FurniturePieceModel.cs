@@ -16,6 +16,9 @@ namespace GrechMotorsPrd.Shared.Models
 
         // Clave foránea que referencia al ID de la pieza asociada
         public int piece_id { get; set; }
+        
+        // Cantidad de piezas necesarias para el mueble
+        public int quantity { get; set; }
 
         // Propiedad de navegación que permite acceder al mueble asociado
         public FurnitureModel? Furniture { get; set; }

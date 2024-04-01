@@ -28,38 +28,7 @@ namespace GrechMotorsPrd.Shared.Models
         // Propiedad de navegación
         public UserModel? User { get; set; } // Relación muchos a uno con UserModel
         public List<UnitFurnitureModel>? UnitFurnitures { get; set; } // Propiedad de navegación para la relación muchos a muchos con UnitFurnitureModel
-
-        // Constructor de la clase UnitModel
-        //public UnitModel()
-        //{
-        //    AddUnitFurnitures(); // Método para añadir muebles a la unidad, se llama al crear una nueva instancia de UnitModel
-        //}
-
-        //// Método privado para añadir muebles a la unidad
-        //private void AddUnitFurnitures()
-        //{
-        //    UnitFurnitures = new List<UnitFurnitureModel>(); // Inicializa la lista de muebles asociados a la unidad
-        //    // Si el modelo de la unidad es "Tour 170" y la extensión es 1, se agregan muebles específicos a la lista de muebles asociados a la unidad
-        //    if (model == "Tour 170" && ext == 1)
-        //    {
-        //        // Agrega muebles a la lista de muebles asociados a la unidad con sus respectivos ids y el id de la unidad
-        //        UnitFurnitures.Add(new UnitFurnitureModel { furniture_id = 2, unit_id = id });
-        //        UnitFurnitures.Add(new UnitFurnitureModel { furniture_id = 3, unit_id = id });
-        //        UnitFurnitures.Add(new UnitFurnitureModel { furniture_id = 4, unit_id = id });
-        //        UnitFurnitures.Add(new UnitFurnitureModel { furniture_id = 5, unit_id = id });
-        //        UnitFurnitures.Add(new UnitFurnitureModel { furniture_id = 6, unit_id = id });
-        //        UnitFurnitures.Add(new UnitFurnitureModel { furniture_id = 7, unit_id = id });
-        //        UnitFurnitures.Add(new UnitFurnitureModel { furniture_id = 8, unit_id = id });
-        //        UnitFurnitures.Add(new UnitFurnitureModel { furniture_id = 9, unit_id = id });
-        //        UnitFurnitures.Add(new UnitFurnitureModel { furniture_id = 10, unit_id = id });
-        //        UnitFurnitures.Add(new UnitFurnitureModel { furniture_id = 11, unit_id = id });
-        //        UnitFurnitures.Add(new UnitFurnitureModel { furniture_id = 12, unit_id = id });
-        //        UnitFurnitures.Add(new UnitFurnitureModel { furniture_id = 13, unit_id = id });
-        //        UnitFurnitures.Add(new UnitFurnitureModel { furniture_id = 14, unit_id = id });
-        //        UnitFurnitures.Add(new UnitFurnitureModel { furniture_id = 15, unit_id = id });
-        //        UnitFurnitures.Add(new UnitFurnitureModel { furniture_id = 16, unit_id = id });
-        //        UnitFurnitures.Add(new UnitFurnitureModel { furniture_id = 17, unit_id = id });
-        //    }
-        //}
+        public List<UnitPieceCodeModel>? UnitPiecesCodes { get; set; } // Propiedad de navegación para la relación muchos a muchos con UnitPieceCodeModel
+        public List<UnitFurnitureCodeModel>? UnitFurnituresCodes { get; set; } // Propiedad de navegación para la relación muchos a muchos con UnitFurnitureCodeModel
     }
 }
