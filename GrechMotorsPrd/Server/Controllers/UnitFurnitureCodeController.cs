@@ -40,6 +40,19 @@ namespace GrechMotorsPrd.Server.Controllers
             return Ok(miobjeto);
         }
 
+        // GET: api/UnitFurnitureCode/getUnitFurnitureByQrCode/{qr_Code}
+        [HttpGet]
+        [Route("getUnitFurnitureByQrCode/{qr_Code}")]
+        public async Task<ActionResult<List<UnitFurnitureCodeModel>>> GetUnitFurnitureByQrCode(string qr_Code)
+        {
+            var miobjeto = await _context.unitsfurniturescodes.FirstOrDefaultAsync(ob => ob.qr_code_number == qr_Code);
+            if (miobjeto == null)
+            {
+                return NotFound(" :/");
+            }
+            return Ok(miobjeto);
+        }
+
         //Get: api/UnitFurnitureCode/getFurnituresQrIdentificationCodeByUnit/{unit_id}
         [HttpGet]
         [Route("getFurnituresQrIdentificationCodesByUnit/{unit_id}")]

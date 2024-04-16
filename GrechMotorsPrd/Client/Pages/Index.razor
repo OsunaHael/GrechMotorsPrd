@@ -1,17 +1,17 @@
 ﻿@page "/"
 
+@using GrechMotorsPrd.Shared.Models
+@inject HttpClient Http
+
 <div class="container vh-100 d-flex justify-content-center align-items-center mb-3">
     <div class="col-lg-8 col-md-10 col-sm-12">
         <div class="bg-white rounded-3 p-4 shadow-lg">
-            <div class="m-3">
-                <div class="row">
-                    <div class="col">
-                        <h1>Inicio</h1>
-                    </div>
-                </div>
-                <div class="row m-3">
-                    <div class="col d-flex">
-                        <input type="text" placeholder="Ingresa el código" name="search" class="form-control rounded-start">
+            <h1>Inicio</h1>
+            <div class="row m-3">
+                <div class="col">
+                    <label for="QRCode" class="form-label" id="QRCode">Escanea el código QR</label>
+                    <div class="d-flex">
+                        <InputText @bind-Value="qrCode" placeholder="Ingresa el código QR" class="form-control rounded-start"></InputText>
                         <button type="submit" class="btn btn-outline-light bg-primary rounded-end" @onclick="GetUnit">
                             <i class="fa fa-search">
                                 <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
@@ -21,9 +21,76 @@
                         </button>
                     </div>
                 </div>
-                <div class="row m-3">
+                @if(unitFurnitureCodeIsSuccess)
+                {
+                    <div class="row m-3">
+                        <div class="col">
+                            <p>G Number: @unit.g_number</p>
+                            <p>Modelo: @unit.model</p>
+                            <p>Descripción: @furniture.decription</p>
+                            <p>Opcion: @unit.opt</p>
+                            <p>Color: @unit.color</p>
+                        </div>
+                    </div>
+                    <div class="row m-3">
+                        <div class="col">
+                            <label for="UserNumber" class="form-label" id="UserNumber">Número de Usuario</label>
+                            <div class="d-flex">
+                                <InputText @bind-Value="userNumber" placeholder="Escanea tu tarjeta de Usuario" class="form-control rounded-start"></InputText>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row m-3">
+                        <div class="col">
+                            <label for="Procesos" class="form-label">Procesos</label>
+                            <select class="form-select" aria-label="Procesos" id="Procesos">
+                                <option selected>Proceso</option>
+                                <option value="Laminado">Laminado</option>
+                                <option value="Corte">Corte</option>
+                                <option value="Lijado">Lijado</option>
+                                <option value="Pegado de Puertas">Pegado de Puertas</option>
+                                <option value="Laminado de Puertas">Laminado de Puertas</option>
+                                <option value="Lijado / Pintado de Puertas">Lijado / Pintado de Puertas</option>
+                                <option value="Puerta de Fibra">Puerta de Fibra</option>
+                                <option value="Pared Curva">Pared Curva</option>
+                                <option value="Pared Recta">Pared Recta</option>
+                                <option value="Pared de Heater">Pared de Heater</option>
+                                <option value="Paredes Laterales de Fibra">Paredes Laterales de Fibra</option>
+                                <option value="Tapizado">Tapizado</option>
+                                <option value="Pulido de Piedra">Pulido de Piedra</option>
+                                <option value="Closet o Mueble de Refri">Closet o Mueble de Refri</option>
+                                <option value="Ottoman">Ottoman</option>
+                                <option value="Portavasos">Portavasos</option>
+                                <option value="Cajones de Pared">Cajones de Pared</option>
+                                <option value="DVD Armado">DVD Armado</option>
+                                <option value="Galley (Estructura)">Galley (Estructura)</option>
+                                <option value="Galley (Instalacion de Puertas)">Galley (Instalacion de Puertas)</option>
+                                <option value="Galley (Piedra y Tuberia)">Galley (Piedra y Tuberia)</option>
+                                <option value="Gabinetes Superior (Estructura)">Gabinetes Superior (Estructura)</option>
+                                <option value="Gabinetes Superior (Instalacion de puertas)">Gabinetes Superior (Instalacion de puertas)</option>
+                                <option value="Gabinete Trasero Estructura">Gabinete Trasero Estructura</option>
+                                <option value="Gabinete Trasero Puerta">Gabinete Trasero Puerta</option>
+                                <option value="Instalacion de Luces">Instalacion de Luces</option>
+                                <option value="Entrega">Entrega</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row m-3">
+                        <div class="col">
+                            <button class="btn btn-success px-4">Pass</button>
+                            <button class="btn btn-danger px-4 mx-2">Fail</button>
+                        </div>
+                    </div>
+                    unitFurnitureCodeIsSuccess = false;
+                }
+                else if(unitPieceCodeIsSuccess)
+                {
+                    <p>El codigo es una pieza</p>
+                    unitPieceCodeIsSuccess = false;
+                }
+                @* <div class="row m-3">
                     <div class="col">
-                        @if (unitNumber == null)
+                        @if (qrCode == null)
                         {
                             <p class="text-center"><em>Loading...</em></p>
                         }
@@ -68,7 +135,7 @@
                         <button class="btn btn-success px-4">Pass</button>
                         <button class="btn btn-danger px-4 mx-2">Fail</button>
                     </div>
-                </div>
+                </div> *@
             </div>
         </div>
     </div>
@@ -76,20 +143,56 @@
 
 
 @code {
-    private string unitNumber = "";
-    private string userNumber = "";
+    FurniturePieceModel furniturePiece = new FurniturePieceModel();
+    UnitFurnitureModel unitFurniture = new UnitFurnitureModel();
+    UnitPieceCodeModel unitPieceCode = new UnitPieceCodeModel();
+    UnitFurnitureCodeModel unitFurnitureCode = new UnitFurnitureCodeModel();
+    UnitModel unit = new UnitModel();
+    FurnitureModel furniture = new FurnitureModel();
+    PieceModel piece = new PieceModel();
+    UserModel user = new UserModel();   
+    HttpResponseMessage response = new HttpResponseMessage();
 
-    private void GetUnit()
-    {
-        // Aquí puedes agregar la lógica para consultar tu base de datos con el término de búsqueda (searchTerm)
-        // Por ejemplo, podrías usar Entity Framework para consultar una base de datos en C#
-        // Luego, puedes mostrar los resultados en tu página
-    }
+    string qrCode = "";
+    string userNumber = "";
+    bool unitFurnitureCodeIsSuccess = false;
+    bool unitPieceCodeIsSuccess = false;
 
-    private void GetUser()
+    private async void GetUnit()
     {
-        // Aquí puedes agregar la lógica para consultar tu base de datos con el término de búsqueda (searchTerm)
-        // Por ejemplo, podrías usar Entity Framework para consultar una base de datos en C#
-        // Luego, puedes mostrar los resultados en tu página
+        string furnitureCodesUrl = $"api/UnitFurnitureCode/getUnitFurnitureByQrCode/{qrCode}";
+        string pieceCodesUrl = $"api/UnitPieceCode/getUnitPieceByIdentificationCode/{qrCode}";
+        string unitFurnitureUrl = $"api/Unit/getUnitById/{unitFurnitureCode.unit_id}";
+        string unitPieceUrl = $"api/Unit/getUnitById/{unitPieceCode.unit_id}";
+        string furnitureUrl = $"api/Furniture/getFurnitureById/{unitFurnitureCode.furniture_id}";
+        string pieceUrl = $"api/Piece/getPieceById/{unitPieceCode.piece_id}";
+
+        response = await Http.GetAsync(furnitureCodesUrl);
+        if(response.IsSuccessStatusCode)
+        {
+            unitFurnitureCode = await response.Content.ReadFromJsonAsync<UnitFurnitureCodeModel>();
+            var unitResponse = await Http.GetAsync(unitFurnitureUrl);
+            unit = await unitResponse.Content.ReadFromJsonAsync<UnitModel>();
+            var furnitureResponse = await Http.GetAsync(furnitureUrl);
+            furniture = await furnitureResponse.Content.ReadFromJsonAsync<FurnitureModel>();
+            unitFurnitureCodeIsSuccess = true;
+            StateHasChanged();
+        }
+        else if(response.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            response = await Http.GetAsync(pieceCodesUrl);
+            if(response.IsSuccessStatusCode)
+            {
+                unitPieceCode = await response.Content.ReadFromJsonAsync<UnitPieceCodeModel>();
+                unitPieceCodeIsSuccess = true;
+                StateHasChanged();
+            }
+        }
+        else
+        {
+            Console.WriteLine(response.StatusCode);
+            unitFurnitureCodeIsSuccess = false;
+            unitPieceCodeIsSuccess = false;
+        }
     }
 }

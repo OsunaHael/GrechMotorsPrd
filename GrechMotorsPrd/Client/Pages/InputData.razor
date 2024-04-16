@@ -1,4 +1,5 @@
 ﻿@page "/inputdata"
+
 @using GrechMotorsPrd.Shared.Models
 @using Newtonsoft.Json;
 @using System.Collections.Concurrent
@@ -228,7 +229,7 @@
 
             foreach (var furniture in furnituresM)
             {
-                var identificationCode = $"{unit.cut_off_date.ToString("ddMMyy")}{unit.line}{furniture.furniture_number}";
+                var identificationCode = $"{unit.cut_off_date.ToString("ddMMyy")}{unit.line}{unit.id}{furniture.furniture_number}M";
                 identificationCodes.Enqueue(identificationCode);
                 qrFurnitureCodeImage.Enqueue(qrGenerator.GenerateQrCode(identificationCode));
             }
@@ -264,7 +265,7 @@
                 foreach (var id in relatedPieceIds)
                 {
                     var piece = piecesM.First(piece => piece.id == id);
-                    var identificationCode = $"{unit.cut_off_date.ToString("ddMMyy")}{unit.line}{furniture.furniture_number}{piece.piece_number}";
+                    var identificationCode = $"{unit.cut_off_date.ToString("ddMMyy")}{unit.line}{furniture.furniture_number}{piece.piece_number}P";
                     identificationCodes.Enqueue(identificationCode);
                     qrPieceCodeImage.Enqueue(qrGenerator.GenerateQrCode(identificationCode));
                 }

@@ -9,7 +9,7 @@ namespace GrechMotorsPrd.Shared.Models
     public class UserModel
     {
         public int id { get; set; }
-        public int user_number { get; set; }
+        public string? user_number { get; set; }
         public string? username { get; set; }
         public string? pwd { get; set; }
         public string? email { get; set; }
