@@ -2,49 +2,142 @@
 
 @using GrechMotorsPrd.Shared.Models
 @inject HttpClient Http
+@inject SweetAlertService Swal
 
 <div class="container vh-100 d-flex justify-content-center align-items-center mb-3">
     <div class="col-lg-8 col-md-10 col-sm-12">
         <div class="bg-white rounded-3 p-4 shadow-lg">
-            <h1>Inicio</h1>
+            <h1>Inicio / Start</h1>
             <div class="row m-3">
-                <div class="col">
-                    <label for="QRCode" class="form-label" id="QRCode">Escanea el código QR</label>
-                    <div class="d-flex">
-                        <InputText @bind-Value="qrCode" placeholder="Ingresa el código QR" class="form-control rounded-start"></InputText>
-                        <button type="submit" class="btn btn-outline-light bg-primary rounded-end" @onclick="GetUnit">
-                            <i class="fa fa-search">
-                                <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.25 19.25L15.5 15.5M4.75 11C4.75 7.54822 7.54822 4.75 11 4.75C14.4518 4.75 17.25 7.54822 17.25 11C17.25 14.4518 14.4518 17.25 11 17.25C7.54822 17.25 4.75 14.4518 4.75 11Z"></path>
-                                </svg>
-                            </i>
-                        </button>
+                <div class="row m-3">
+                    <div class="col">
+                        @* <label for="QRCode" class="form-label" id="QRCode">Escanea el código QR</label> *@
+                        <div class="d-flex">
+                            <InputText @bind-Value="qrCode" placeholder="Escanea el Código QR / Scan the QR Code" class="form-control rounded-start"></InputText>
+                            @if(qrCode.EndsWith("M"))
+                            {
+                                <button type="submit" class="btn btn-outline-light bg-primary rounded-end" @onclick="GetFurnitureInfo">
+                                    <i class="fa fa-search">
+                                        <svg width="24" height="24" fill="none" viewBox="0 0 24 24">Giovanni00
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.25 19.25L15.5 15.5M4.75 11C4.75 7.54822 7.54822 4.75 11 4.75C14.4518 4.75 17.25 7.54822 17.25 11C17.25 14.4518 14.4518 17.25 11 17.25C7.54822 17.25 4.75 14.4518 4.75 11Z"></path>
+                                        </svg>
+                                    </i>
+                                </button>
+                            }
+                            else if(qrCode.EndsWith("P"))
+                            {
+                                <button type="submit" class="btn btn-outline-light bg-primary rounded-end" @onclick="GetPieceInfo">
+                                    <i class="fa fa-search">
+                                        <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.25 19.25L15.5 15.5M4.75 11C4.75 7.54822 7.54822 4.75 11 4.75C14.4518 4.75 17.25 7.54822 17.25 11C17.25 14.4518 14.4518 17.25 11 17.25C7.54822 17.25 4.75 14.4518 4.75 11Z"></path>
+                                        </svg>
+                                    </i>
+                                </button>
+                            }
+                            else
+                            {
+                                <button type="submit" class="btn btn-outline-light bg-primary rounded-end">
+                                    <i class="fa fa-search">
+                                        <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.25 19.25L15.5 15.5M4.75 11C4.75 7.54822 7.54822 4.75 11 4.75C14.4518 4.75 17.25 7.54822 17.25 11C17.25 14.4518 14.4518 17.25 11 17.25C7.54822 17.25 4.75 14.4518 4.75 11Z"></path>
+                                        </svg>
+                                    </i>
+                                </button>
+                            }
+                        </div>
                     </div>
                 </div>
                 @if(unitFurnitureCodeIsSuccess)
                 {
+                    unitPieceCodeIsSuccess = false;
                     <div class="row m-3">
                         <div class="col">
                             <p>G Number: @unit.g_number</p>
-                            <p>Modelo: @unit.model</p>
-                            <p>Descripción: @furniture.decription</p>
-                            <p>Opcion: @unit.opt</p>
+                            <p>Modelo / Unit Model: @unit.model</p>
+                            <p>Número de mueble / Furniture Number: @furniture.furniture_number</p>
+                            <p>Descripción / Description: @furniture.description</p>
+                            <p>Opcion / Option: @unit.opt</p>
                             <p>Color: @unit.color</p>
                         </div>
                     </div>
                     <div class="row m-3">
                         <div class="col">
-                            <label for="UserNumber" class="form-label" id="UserNumber">Número de Usuario</label>
+                            <label for="UserNumber" class="form-label" id="UserNumber">Número de Usuario / User Id</label>
                             <div class="d-flex">
-                                <InputText @bind-Value="userNumber" placeholder="Escanea tu tarjeta de Usuario" class="form-control rounded-start"></InputText>
+                                <InputText @bind-Value="userNumber" placeholder="Escanea tu tarjeta de Usuario / Scan your User Id" class="form-control rounded-start"></InputText>
+                                <button type="submit" class="btn btn-outline-light bg-primary rounded-end" @onclick="GetUser">
+                                    <i class="fa fa-search">
+                                        <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.25 19.25L15.5 15.5M4.75 11C4.75 7.54822 7.54822 4.75 11 4.75C14.4518 4.75 17.25 7.54822 17.25 11C17.25 14.4518 14.4518 17.25 11 17.25C7.54822 17.25 4.75 14.4518 4.75 11Z"></path>
+                                        </svg>
+                                    </i>
+                                </button>
                             </div>
                         </div>
                     </div>
                     <div class="row m-3">
                         <div class="col">
-                            <label for="Procesos" class="form-label">Procesos</label>
-                            <select class="form-select" aria-label="Procesos" id="Procesos">
-                                <option selected>Proceso</option>
+                            <p>Nombre de Usuario / Username: @user.username</p>
+                        </div>
+                    </div>
+                    <div class="row m-3">
+                        <div class="col">
+                            <label for="Procesos" class="form-label">Procesos / Process</label>
+                            <InputSelect @bind-Value="furnitureStatus.furniture_status" class="form-select" aria-label="Procesos" id="Procesos">
+                                <option selected>Proceso / Process</option>
+                                <option value="Armado 1">Armado 1 / Assembly 1</option>
+                                <option value="Armado 2">Armado 2 / Assembly 2</option>
+                                <option value="Armado 3">Armado 3 / Assembly 3</option>
+                            </InputSelect>
+                        </div>
+                    </div>
+                    <div class="row m-3">
+                        <div class="col">
+                            <button class="btn btn-success px-4">Pass</button>
+                            <button class="btn btn-danger px-4 mx-2">Fail</button>
+                        </div>
+                    </div> 
+                }
+                else if(unitPieceCodeIsSuccess)
+                {
+                    unitFurnitureCodeIsSuccess = false;
+                    <div class="row m-3">
+                        <div class="col">
+                            <p>G Number: @unit.g_number</p>
+                            <p>Modelo / Unit Model: @unit.model</p>
+                            <p>Opcion / Option: @unit.opt</p>
+                            <p>Color: @unit.color</p>
+                            <p>Numero de Pieza / Piece Number: @piece.piece_number</p>
+                        </div>
+                        <div class="col">
+                            <img src="@($"/Images/Pieces/{piece.piece_number}.png")" alt="Imagen de la pieza" />
+                        </div>
+                    </div>
+                    <div class="row m-3">
+                        <div class="col">
+                            <label for="UserNumber" class="form-label" id="UserNumber">Número de Usuario / User Id</label>
+                            <div class="d-flex">
+                                <InputText @bind-Value="userNumber" placeholder="Escanea tu tarjeta de Usuario / Scan your User Id" class="form-control rounded-start"></InputText>
+                                <button type="submit" class="btn btn-outline-light bg-primary rounded-end" @onclick="GetUser">
+                                    <i class="fa fa-search">
+                                        <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.25 19.25L15.5 15.5M4.75 11C4.75 7.54822 7.54822 4.75 11 4.75C14.4518 4.75 17.25 7.54822 17.25 11C17.25 14.4518 14.4518 17.25 11 17.25C7.54822 17.25 4.75 14.4518 4.75 11Z"></path>
+                                        </svg>
+                                    </i>
+                                </button>                                
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row m-3">
+                        <div class="col">
+                            <p>Nombre de Usuario / Username: @user.username</p>
+                        </div>
+                    </div>
+                    <div class="row m-3">
+                        <div class="col">
+                            <label for="Procesos" class="form-label">Procesos / Process</label>
+                            <InputSelect @bind-Value="pieceStatus.piece_status" class="form-select" aria-label="Procesos" id="Procesos">
+                                <option selected>Proceso / Process</option>
                                 <option value="Laminado">Laminado</option>
                                 <option value="Corte">Corte</option>
                                 <option value="Lijado">Lijado</option>
@@ -72,77 +165,23 @@
                                 <option value="Gabinete Trasero Puerta">Gabinete Trasero Puerta</option>
                                 <option value="Instalacion de Luces">Instalacion de Luces</option>
                                 <option value="Entrega">Entrega</option>
-                            </select>
+                            </InputSelect>
                         </div>
                     </div>
                     <div class="row m-3">
                         <div class="col">
-                            <button class="btn btn-success px-4">Pass</button>
-                            <button class="btn btn-danger px-4 mx-2">Fail</button>
+                            <button class="btn btn-success px-4" @onclick="Pass">Pass</button>
+                            <button class="btn btn-danger px-4 mx-2" @onclick="Fail">Fail</button>
                         </div>
                     </div>
-                    unitFurnitureCodeIsSuccess = false;
                 }
-                else if(unitPieceCodeIsSuccess)
-                {
-                    <p>El codigo es una pieza</p>
-                    unitPieceCodeIsSuccess = false;
-                }
-                @* <div class="row m-3">
-                    <div class="col">
-                        @if (qrCode == null)
-                        {
-                            <p class="text-center"><em>Loading...</em></p>
-                        }
-                        else
-                        {
-                            <div class="unitdata">
-                                <p class="mb-2">G_Number: 8964</p>
-                                <p class="mb-2">Modelo: Tour-170 ext</p>
-                                <p class="mb-2">Opcion: Regular</p>
-                                <p class="mb-2">Color: Claro</p>
-                                <p class="mb-2">Descripcion: Pared lateral de baño</p>
-                            </div>
-                        }
-                    </div>
-                </div>
-                <div class="row m-3">
-                    <div class="col d-flex">
-                        <input type="text" placeholder="Número de empleado" name="search" class="form-control rounded-start" @bind="userNumber">
-                        <button type="submit" class="btn btn-outline-light bg-primary rounded-end" @onclick="GetUser">
-                            <i class="fa fa-search">
-                                <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.25 19.25L15.5 15.5M4.75 11C4.75 7.54822 7.54822 4.75 11 4.75C14.4518 4.75 17.25 7.54822 17.25 11C17.25 14.4518 14.4518 17.25 11 17.25C7.54822 17.25 4.75 14.4518 4.75 11Z"></path>
-                                </svg>
-                            </i>
-                        </button>
-                    </div>
-                </div>
-                <div class="row m-3">
-                    <div class="col">
-                        <label for="Procesos" class="form-label">Procesos</label>
-                        <select class="form-select" aria-label="Procesos" id="Procesos">
-                            <option selected>Proceso</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="row m-3">
-                    <div class="col">
-                        <button class="btn btn-success px-4">Pass</button>
-                        <button class="btn btn-danger px-4 mx-2">Fail</button>
-                    </div>
-                </div> *@
             </div>
         </div>
     </div>
 </div>
 
-
-@code {
+@code 
+{
     FurniturePieceModel furniturePiece = new FurniturePieceModel();
     UnitFurnitureModel unitFurniture = new UnitFurnitureModel();
     UnitPieceCodeModel unitPieceCode = new UnitPieceCodeModel();
@@ -152,47 +191,108 @@
     PieceModel piece = new PieceModel();
     UserModel user = new UserModel();   
     HttpResponseMessage response = new HttpResponseMessage();
+    PieceStatusHistory pieceStatus = new PieceStatusHistory();
+    FurnitureStatusHistory furnitureStatus = new FurnitureStatusHistory();
 
     string qrCode = "";
     string userNumber = "";
     bool unitFurnitureCodeIsSuccess = false;
     bool unitPieceCodeIsSuccess = false;
 
-    private async void GetUnit()
+    private async Task GetFurnitureInfo()
     {
-        string furnitureCodesUrl = $"api/UnitFurnitureCode/getUnitFurnitureByQrCode/{qrCode}";
-        string pieceCodesUrl = $"api/UnitPieceCode/getUnitPieceByIdentificationCode/{qrCode}";
-        string unitFurnitureUrl = $"api/Unit/getUnitById/{unitFurnitureCode.unit_id}";
-        string unitPieceUrl = $"api/Unit/getUnitById/{unitPieceCode.unit_id}";
-        string furnitureUrl = $"api/Furniture/getFurnitureById/{unitFurnitureCode.furniture_id}";
-        string pieceUrl = $"api/Piece/getPieceById/{unitPieceCode.piece_id}";
+        try
+        {
+            string furnitureCodesUrl = $"api/UnitFurnitureCode/getUnitFurnitureByQrCode/{qrCode}";
+            string unitFurnitureUrl = $"api/Unit/{unitFurnitureCode.unit_id}";
+            string furnitureUrl = $"api/Furniture/getFurnitureById/{unitFurnitureCode.furniture_id}";
 
-        response = await Http.GetAsync(furnitureCodesUrl);
-        if(response.IsSuccessStatusCode)
-        {
-            unitFurnitureCode = await response.Content.ReadFromJsonAsync<UnitFurnitureCodeModel>();
-            var unitResponse = await Http.GetAsync(unitFurnitureUrl);
-            unit = await unitResponse.Content.ReadFromJsonAsync<UnitModel>();
-            var furnitureResponse = await Http.GetAsync(furnitureUrl);
-            furniture = await furnitureResponse.Content.ReadFromJsonAsync<FurnitureModel>();
-            unitFurnitureCodeIsSuccess = true;
-            StateHasChanged();
-        }
-        else if(response.StatusCode == System.Net.HttpStatusCode.NotFound)
-        {
-            response = await Http.GetAsync(pieceCodesUrl);
-            if(response.IsSuccessStatusCode)
+            response = await Http.GetAsync(furnitureCodesUrl);
+            if (response.IsSuccessStatusCode)
             {
-                unitPieceCode = await response.Content.ReadFromJsonAsync<UnitPieceCodeModel>();
-                unitPieceCodeIsSuccess = true;
+                unitPieceCodeIsSuccess = false;
+                unitFurnitureCode = await response.Content.ReadFromJsonAsync<UnitFurnitureCodeModel>();
+
+                // Asegúrate de que unitFurnitureCode se ha establecido antes de usarlo en la siguiente llamada HTTP
+                unitFurnitureUrl = $"api/Unit/{unitFurnitureCode.unit_id}";
+                var unitResponse = await Http.GetAsync(unitFurnitureUrl);
+                unit = await unitResponse.Content.ReadFromJsonAsync<UnitModel>();
+
+                // Asegúrate de que unitFurnitureCode se ha establecido antes de usarlo en la siguiente llamada HTTP
+                furnitureUrl = $"api/Furniture/getFurnitureById/{unitFurnitureCode.furniture_id}";
+                var furnitureResponse = await Http.GetAsync(furnitureUrl);
+                furniture = await furnitureResponse.Content.ReadFromJsonAsync<FurnitureModel>();
+
+                unitFurnitureCodeIsSuccess = true;
                 StateHasChanged();
             }
+        }
+        catch(Exception ex)
+        {
+            await Swal.FireAsync(
+                "Error",
+                "Upss... Se encontró un error",
+                SweetAlertIcon.Error
+            );
+            await Swal.CloseAsync();
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+    private async Task GetPieceInfo()
+    {
+        string pieceCodesUrl = $"api/UnitPieceCode/getUnitPieceByIdentificationCode/{qrCode}";
+        string unitPieceUrl = $"api/Unit/{unitPieceCode.unit_id}";
+        string pieceUrl = $"api/Piece/getPieceById/{unitPieceCode.piece_id}";
+
+        response = await Http.GetAsync(pieceCodesUrl);
+        if (response.IsSuccessStatusCode)
+        {
+            unitFurnitureCodeIsSuccess = false;
+            unitPieceCode = await response.Content.ReadFromJsonAsync<UnitPieceCodeModel>();
+
+            // Asegúrate de que unitPieceCode se ha establecido antes de usarlo en la siguiente llamada HTTP
+            unitPieceUrl = $"api/Unit/{unitPieceCode.unit_id}";
+            var unitResponse = await Http.GetAsync(unitPieceUrl);
+            unit = await unitResponse.Content.ReadFromJsonAsync<UnitModel>();
+
+            // Asegúrate de que unitPieceCode se ha establecido antes de usarlo en la siguiente llamada HTTP
+            pieceUrl = $"api/Piece/getPieceById/{unitPieceCode.piece_id}";
+            var pieceResponse = await Http.GetAsync(pieceUrl);
+            piece = await pieceResponse.Content.ReadFromJsonAsync<PieceModel>();
+
+            unitPieceCodeIsSuccess = true;
+            StateHasChanged();
         }
         else
         {
             Console.WriteLine(response.StatusCode);
-            unitFurnitureCodeIsSuccess = false;
-            unitPieceCodeIsSuccess = false;
         }
+    }
+
+    private async Task GetUser()
+    {
+        string userUrl = $"api/User/getUserByUserNumber/{userNumber}";
+
+        response = await Http.GetAsync(userUrl);
+        if (response.IsSuccessStatusCode)
+        {
+            user = await response.Content.ReadFromJsonAsync<UserModel>();
+            StateHasChanged();
+        }
+        else
+        {
+            Console.WriteLine(response.StatusCode);
+        }
+    }
+
+    private async Task Pass()
+    {
+
+    }
+
+    private async Task Fail()
+    {
+        
     }
 }

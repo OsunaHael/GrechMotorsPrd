@@ -22,5 +22,7 @@ namespace GrechMotorsPrd.Shared.Models
         public List<UnitModel>? Unit { get; set; } // Relación uno a muchos con UnitModel
         public List<UserPieceModel>? UserPieces { get; set; } // Propiedad de navegación para la relación muchos a muchos con UserPieceModel
         public List<UserFurnitureModel>? UserFurnitures { get; set; } // Propiedad de navegación para la relación muchos a muchos con UserFurnitureModel
+        public List<PieceStatusHistory>? PieceStatusHistories { get; set; } // Propiedad de navegación para la relación uno a muchos con PieceStatusHistory
+        public List<FurnitureStatusHistory>? FurnitureStatusHistories { get; set; } // Propiedad de navegación para la relación uno a muchos con FurnitureStatusHistory
     }
 }

@@ -24,5 +24,6 @@ namespace GrechMotorsPrd.Shared.Models
         public List<FurniturePieceModel>? FurniturePieces { get; set; } //Relacion Muchos a Muchos con FurnitureModel
         public List<UserPieceModel>? UserPieces { get; set; } //Relacion Muchos a Muchos con UserModel
         public List<UnitPieceCodeModel>? UnitPiecesCodes { get; set; } //Relacion Muchos a Muchos con UnitModel
+        public List<PieceStatusHistory>? PieceStatusHistories { get; set; } //Relacion Uno a Muchos con PieceStatusHistory
     }
 }

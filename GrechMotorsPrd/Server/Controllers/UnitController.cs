@@ -54,7 +54,7 @@ namespace GrechMotorsPrd.Server.Controllers
             return Ok(miobjeto);
         }
 
-        // GET: api/Unit/get/{model}
+        // GET: api/Unit/getModel/{model}
         [HttpGet]
         [Route("getModel/{model}")]
         public async Task<ActionResult<List<UnitModel>>> GetUnitByModel(string model)
@@ -67,6 +67,8 @@ namespace GrechMotorsPrd.Server.Controllers
             }
             return Ok(units);
         }
+        
+        // GET: api/Unit/getUnitById
 
         // POST: api/Unit
         [HttpPost]
