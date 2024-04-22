@@ -9,7 +9,7 @@
         <div class="bg-white rounded-3 p-4 shadow-lg">
             <h1>Inicio / Start</h1>
             <div class="row m-3">
-                <div class="row m-3">
+                <div class="row m-1">
                     <div class="col">
                         @* <label for="QRCode" class="form-label" id="QRCode">Escanea el código QR</label> *@
                         <div class="d-flex">
@@ -50,7 +50,7 @@
                 @if(unitFurnitureCodeIsSuccess)
                 {
                     unitPieceCodeIsSuccess = false;
-                    <div class="row m-3">
+                    <div class="row m-1">
                         <div class="col">
                             <p>G Number: @unit.g_number</p>
                             <p>Modelo / Unit Model: @unit.model</p>
@@ -60,7 +60,7 @@
                             <p>Color: @unit.color</p>
                         </div>
                     </div>
-                    <div class="row m-3">
+                    <div class="row m-1">
                         <div class="col">
                             <label for="UserNumber" class="form-label" id="UserNumber">Número de Usuario / User Id</label>
                             <div class="d-flex">
@@ -75,15 +75,15 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row m-3">
+                    <div class="row m-1">
                         <div class="col">
                             <p>Nombre de Usuario / Username: @user.username</p>
                         </div>
                     </div>
-                    <div class="row m-3">
+                    <div class="row m-1">
                         <div class="col">
                             <label for="Procesos" class="form-label">Procesos / Process</label>
-                            <InputSelect @bind-Value="furnitureStatus.furniture_status" class="form-select" aria-label="Procesos" id="Procesos">
+                            <InputSelect @bind-Value="status" class="form-select" aria-label="Procesos" id="Procesos">
                                 <option selected>Proceso / Process</option>
                                 <option value="Armado 1">Armado 1 / Assembly 1</option>
                                 <option value="Armado 2">Armado 2 / Assembly 2</option>
@@ -91,17 +91,38 @@
                             </InputSelect>
                         </div>
                     </div>
-                    <div class="row m-3">
+                    <div class="row m-1">
                         <div class="col">
-                            <button class="btn btn-success px-4">Pass</button>
-                            <button class="btn btn-danger px-4 mx-2">Fail</button>
+                            <button class="btn btn-success px-4" @onclick="async () => await FurniturePass(status)">Pass</button>
+                            <button class="btn btn-danger px-4 mx-2" @onclick="FurnitureFail">Fail</button>
                         </div>
-                    </div> 
+                    </div>
+                    @if (furnitureFail)
+                    {
+                        <div class="row m-1">
+                            <div class="col">
+
+                                <label for="Fail" class="form-label">Cual fue la falla? / Why did it fail?</label>
+                                <InputSelect @bind-Value="failStatus" class="form-select" aria-label="Fail" id="Fail">
+                                    <option value="null" selected>Selecciona una opción</option>
+                                    <option value="Rallado" selected>Rallado</option>
+                                    <option value="Roto" selected>Roto</option>
+                                    <option value="Pandeado" selected>Pandeado</option>
+                                    <option value="Astillado" selected>Astillado</option>
+                                </InputSelect>
+                            </div>
+                        </div>
+                        <div class="row m-1">
+                            <div class="col">
+                                <button class="btn btn-danger px-4" @onclick="async () => await PiecePass(failStatus)">Enviar reporte de falla</button>
+                            </div>
+                        </div>
+                    }
                 }
                 else if(unitPieceCodeIsSuccess)
                 {
                     unitFurnitureCodeIsSuccess = false;
-                    <div class="row m-3">
+                    <div class="row m-1">
                         <div class="col">
                             <p>G Number: @unit.g_number</p>
                             <p>Modelo / Unit Model: @unit.model</p>
@@ -113,7 +134,7 @@
                             <img src="@($"/Images/Pieces/{piece.piece_number}.png")" alt="Imagen de la pieza" />
                         </div>
                     </div>
-                    <div class="row m-3">
+                    <div class="row m-1">
                         <div class="col">
                             <label for="UserNumber" class="form-label" id="UserNumber">Número de Usuario / User Id</label>
                             <div class="d-flex">
@@ -128,15 +149,15 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row m-3">
+                    <div class="row m-1">
                         <div class="col">
                             <p>Nombre de Usuario / Username: @user.username</p>
                         </div>
                     </div>
-                    <div class="row m-3">
+                    <div class="row m-1">
                         <div class="col">
                             <label for="Procesos" class="form-label">Procesos / Process</label>
-                            <InputSelect @bind-Value="pieceStatus.piece_status" class="form-select" aria-label="Procesos" id="Procesos">
+                            <InputSelect @bind-Value="status" class="form-select" aria-label="Procesos" id="Procesos">
                                 <option selected>Proceso / Process</option>
                                 <option value="Laminado">Laminado</option>
                                 <option value="Corte">Corte</option>
@@ -168,12 +189,33 @@
                             </InputSelect>
                         </div>
                     </div>
-                    <div class="row m-3">
+                    <div class="row m-1">
                         <div class="col">
-                            <button class="btn btn-success px-4" @onclick="Pass">Pass</button>
-                            <button class="btn btn-danger px-4 mx-2" @onclick="Fail">Fail</button>
+                            <button class="btn btn-success px-4" @onclick="async () => await PiecePass(status)">Pass</button>
+                            <button class="btn btn-danger px-4 mx-2" @onclick="PieceFail">Fail</button>
                         </div>
                     </div>
+                    @if (pieceFail)
+                    {
+                        <div class="row m-1">
+                            <div class="col">
+
+                                <label for="Fail" class="form-label">Cual fue la falla? / Why did it fail?</label>
+                                <InputSelect @bind-Value="failStatus" class="form-select" aria-label="Fail" id="Fail">
+                                    <option value="null" selected>Selecciona una opción</option>
+                                    <option value="Rallado" selected>Rallado</option>
+                                    <option value="Roto" selected>Roto</option>
+                                    <option value="Pandeado" selected>Pandeado</option>
+                                    <option value="Astillado" selected>Astillado</option>
+                                </InputSelect>
+                            </div>
+                        </div>
+                        <div class="row m-1">
+                            <div class="col">
+                                <button class="btn btn-danger px-4" @onclick="async () => await PiecePass(failStatus)">Enviar reporte de falla</button>
+                            </div>
+                        </div>
+                    }
                 }
             </div>
         </div>
@@ -191,13 +233,16 @@
     PieceModel piece = new PieceModel();
     UserModel user = new UserModel();   
     HttpResponseMessage response = new HttpResponseMessage();
-    PieceStatusHistory pieceStatus = new PieceStatusHistory();
-    FurnitureStatusHistory furnitureStatus = new FurnitureStatusHistory();
 
-    string qrCode = "";
-    string userNumber = "";
+    string qrCode = String.Empty;
+    string userNumber = String.Empty;
+    string status = String.Empty;
+    string failStatus = String.Empty;
+    
     bool unitFurnitureCodeIsSuccess = false;
     bool unitPieceCodeIsSuccess = false;
+    bool furnitureFail = false;
+    bool pieceFail = false;
 
     private async Task GetFurnitureInfo()
     {
@@ -241,6 +286,9 @@
 
     private async Task GetPieceInfo()
     {
+        string furnitureCodesUrl = $"api/UnitFurnitureCode/getUnitFurnitureByQrCode/{qrCode}";
+        string unitFurnitureUrl = $"api/Unit/{unitFurnitureCode.unit_id}";
+        string furnitureUrl = $"api/Furniture/getFurnitureById/{unitFurnitureCode.furniture_id}";
         string pieceCodesUrl = $"api/UnitPieceCode/getUnitPieceByIdentificationCode/{qrCode}";
         string unitPieceUrl = $"api/Unit/{unitPieceCode.unit_id}";
         string pieceUrl = $"api/Piece/getPieceById/{unitPieceCode.piece_id}";
@@ -249,7 +297,13 @@
         if (response.IsSuccessStatusCode)
         {
             unitFurnitureCodeIsSuccess = false;
+            unitFurnitureCode = await response.Content.ReadFromJsonAsync<UnitFurnitureCodeModel>();
             unitPieceCode = await response.Content.ReadFromJsonAsync<UnitPieceCodeModel>();
+
+            // Asegúrate de que unitFurnitureCode se ha establecido antes de usarlo en la siguiente llamada HTTP
+            furnitureUrl = $"api/Furniture/getFurnitureById/{unitFurnitureCode.furniture_id}";
+            var furnitureResponse = await Http.GetAsync(furnitureUrl);
+            furniture = await furnitureResponse.Content.ReadFromJsonAsync<FurnitureModel>();
 
             // Asegúrate de que unitPieceCode se ha establecido antes de usarlo en la siguiente llamada HTTP
             unitPieceUrl = $"api/Unit/{unitPieceCode.unit_id}";
@@ -286,13 +340,90 @@
         }
     }
 
-    private async Task Pass()
+    private async Task PiecePass(string pStatus)
     {
+        try
+        {
+            string pieceStatusUrl = $"api/PieceStatusHistory";
+            var pieceStatusHistory = new PieceStatusHistory
+                {
+                    piece_id = piece.id,
+                    unit_id = unit.id,
+                    user_id = user.id,
+                    furniture_id = furniture.id,
+                    piece_status = pStatus
+                };
 
+            response = await Http.PostAsJsonAsync(pieceStatusUrl, pieceStatusHistory);
+            if (response.IsSuccessStatusCode)
+            {
+                await Swal.FireAsync(
+                    "Success",
+                    "¡La pieza ha pasado exitosamente!",
+                    SweetAlertIcon.Success
+                );
+                await Swal.CloseAsync();
+            }
+            pieceFail = false;
+        }
+        catch(Exception ex)
+        {
+            await Swal.FireAsync(
+                    "Error",
+                    "Upss... Se encontró un error",
+                    SweetAlertIcon.Error
+                );
+            await Swal.CloseAsync();
+            Console.WriteLine(ex.Message);
+            throw new Exception("An error occurred while creating the unit.", ex);
+        }
     }
 
-    private async Task Fail()
+    private void PieceFail()
     {
-        
+        pieceFail = true;
+    }
+
+    private async Task FurniturePass(string fStatus)
+    {
+        try
+        {
+            string furnitureStatusUrl = $"api/FurnitureStatusHistory";
+            var furnitureStatusHistory = new FurnitureStatusHistory
+                {
+                    furniture_id = furniture.id,
+                    unit_id = unit.id,
+                    user_id = user.id,
+                    furniture_status = fStatus
+                };
+
+            response = await Http.PostAsJsonAsync(furnitureStatusUrl, furnitureStatusHistory);
+            if (response.IsSuccessStatusCode)
+            {
+                await Swal.FireAsync(
+                    "Success",
+                    "¡El mueble ha pasado exitosamente!",
+                    SweetAlertIcon.Success
+                );
+                await Swal.CloseAsync();
+            }
+            furnitureFail = false;
+        }
+        catch(Exception ex)
+        {
+            await Swal.FireAsync(
+                    "Error",
+                    "Upss... Se encontró un error",
+                    SweetAlertIcon.Error
+                );
+            await Swal.CloseAsync();
+            Console.WriteLine(ex.Message);
+            throw new Exception("An error occurred while creating the unit.", ex);
+        }
+    }
+
+    private void FurnitureFail()
+    {
+        furnitureFail = true;
     }
 }
