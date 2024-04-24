@@ -209,6 +209,7 @@
         catch (Exception ex)
         {
             isLoading = false;
+            StateHasChanged();
             await swal.CloseAsync();
             await swal.FireAsync(
                 "Error",
@@ -437,6 +438,7 @@
                             {
                                 unit_id = unit.id,
                                 piece_id = piece.id,
+                                furniture_id = furniture.id,
                                 qr_code_number = pieceCodes.Peek() // Usa Peek() en lugar de Dequeue()
                             };
 

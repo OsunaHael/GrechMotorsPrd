@@ -18,7 +18,7 @@
                             {
                                 <button type="submit" class="btn btn-outline-light bg-primary rounded-end" @onclick="GetFurnitureInfo">
                                     <i class="fa fa-search">
-                                        <svg width="24" height="24" fill="none" viewBox="0 0 24 24">Giovanni00
+                                        <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
                                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.25 19.25L15.5 15.5M4.75 11C4.75 7.54822 7.54822 4.75 11 4.75C14.4518 4.75 17.25 7.54822 17.25 11C17.25 14.4518 14.4518 17.25 11 17.25C7.54822 17.25 4.75 14.4518 4.75 11Z"></path>
                                         </svg>
                                     </i>
@@ -128,10 +128,13 @@
                             <p>Modelo / Unit Model: @unit.model</p>
                             <p>Opcion / Option: @unit.opt</p>
                             <p>Color: @unit.color</p>
+                            <p>Pertenece a / Belongs to: @furniture.description</p>
                             <p>Numero de Pieza / Piece Number: @piece.piece_number</p>
                         </div>
                         <div class="col">
-                            <img src="@($"/Images/Pieces/{piece.piece_number}.png")" alt="Imagen de la pieza" />
+                            <div class="row">
+                                <img src="@($"/Images/Pieces/{piece.piece_number}.png")" alt="Imagen de la pieza" />
+                            </div>
                         </div>
                     </div>
                     <div class="row m-1">
@@ -286,8 +289,6 @@
 
     private async Task GetPieceInfo()
     {
-        string furnitureCodesUrl = $"api/UnitFurnitureCode/getUnitFurnitureByQrCode/{qrCode}";
-        string unitFurnitureUrl = $"api/Unit/{unitFurnitureCode.unit_id}";
         string furnitureUrl = $"api/Furniture/getFurnitureById/{unitFurnitureCode.furniture_id}";
         string pieceCodesUrl = $"api/UnitPieceCode/getUnitPieceByIdentificationCode/{qrCode}";
         string unitPieceUrl = $"api/Unit/{unitPieceCode.unit_id}";
@@ -297,11 +298,10 @@
         if (response.IsSuccessStatusCode)
         {
             unitFurnitureCodeIsSuccess = false;
-            unitFurnitureCode = await response.Content.ReadFromJsonAsync<UnitFurnitureCodeModel>();
             unitPieceCode = await response.Content.ReadFromJsonAsync<UnitPieceCodeModel>();
 
             // Asegúrate de que unitFurnitureCode se ha establecido antes de usarlo en la siguiente llamada HTTP
-            furnitureUrl = $"api/Furniture/getFurnitureById/{unitFurnitureCode.furniture_id}";
+            furnitureUrl = $"api/Furniture/getFurnitureById/{unitPieceCode.furniture_id}";
             var furnitureResponse = await Http.GetAsync(furnitureUrl);
             furniture = await furnitureResponse.Content.ReadFromJsonAsync<FurnitureModel>();
 
