@@ -114,7 +114,7 @@
                         </div>
                         <div class="row m-1">
                             <div class="col">
-                                <button class="btn btn-danger px-4" @onclick="async () => await PiecePass(failStatus)">Enviar reporte de falla</button>
+                                <button class="btn btn-danger px-4" @onclick="async () => await FurniturePass(failStatus)">Enviar reporte de falla</button>
                             </div>
                         </div>
                     }
@@ -241,7 +241,7 @@
     string userNumber = String.Empty;
     string status = String.Empty;
     string failStatus = String.Empty;
-    
+
     bool unitFurnitureCodeIsSuccess = false;
     bool unitPieceCodeIsSuccess = false;
     bool furnitureFail = false;
@@ -345,16 +345,32 @@
         try
         {
             string pieceStatusUrl = $"api/PieceStatusHistory";
-            var pieceStatusHistory = new PieceStatusHistory
-                {
-                    piece_id = piece.id,
-                    unit_id = unit.id,
-                    user_id = user.id,
-                    furniture_id = furniture.id,
-                    piece_status = pStatus
-                };
-
-            response = await Http.PostAsJsonAsync(pieceStatusUrl, pieceStatusHistory);
+            if(!pieceFail)
+            {
+                var pieceStatusHistory = new PieceStatusHistory
+                    {
+                        piece_id = piece.id,
+                        unit_id = unit.id,
+                        user_id = user.id,
+                        furniture_id = furniture.id,
+                        fail = 0,
+                        piece_status = pStatus
+                    };
+                response = await Http.PostAsJsonAsync(pieceStatusUrl, pieceStatusHistory);
+            }
+            else if(pieceFail)
+            {
+                var pieceStatusHistory = new PieceStatusHistory
+                    {
+                        piece_id = piece.id,
+                        unit_id = unit.id,
+                        user_id = user.id,
+                        furniture_id = furniture.id,
+                        fail = 1,
+                        piece_status = pStatus
+                    };
+                response = await Http.PostAsJsonAsync(pieceStatusUrl, pieceStatusHistory);
+            }
             if (response.IsSuccessStatusCode)
             {
                 await Swal.FireAsync(
@@ -389,15 +405,31 @@
         try
         {
             string furnitureStatusUrl = $"api/FurnitureStatusHistory";
-            var furnitureStatusHistory = new FurnitureStatusHistory
-                {
-                    furniture_id = furniture.id,
-                    unit_id = unit.id,
-                    user_id = user.id,
-                    furniture_status = fStatus
-                };
+            if(!furnitureFail)
+            {
+                var furnitureStatusHistory = new FurnitureStatusHistory
+                    {
+                        furniture_id = furniture.id,
+                        unit_id = unit.id,
+                        user_id = user.id,
+                        fail = 0,
+                        furniture_status = fStatus
+                    };
 
-            response = await Http.PostAsJsonAsync(furnitureStatusUrl, furnitureStatusHistory);
+                response = await Http.PostAsJsonAsync(furnitureStatusUrl, furnitureStatusHistory);
+            }
+            else if(furnitureFail)
+            {
+                var furnitureStatusHistory = new FurnitureStatusHistory
+                    {
+                        furniture_id = furniture.id,
+                        unit_id = unit.id,
+                        user_id = user.id,
+                        fail = 1,
+                        furniture_status = fStatus
+                    };
+                response = await Http.PostAsJsonAsync(furnitureStatusUrl, furnitureStatusHistory);
+            }
             if (response.IsSuccessStatusCode)
             {
                 await Swal.FireAsync(

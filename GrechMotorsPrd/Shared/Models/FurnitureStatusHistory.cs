@@ -13,6 +13,7 @@ namespace GrechMotorsPrd.Shared.Models
         public int unit_id { get; set; }
         public int user_id { get; set; }
         public string? furniture_status { get; set; }
+        public int fail { get; set; }
         public DateTime updated_at { get; set; } = DateTime.Now;
         public FurnitureModel? Furniture { get; set; }
         public UnitModel? Unit { get; set; }
