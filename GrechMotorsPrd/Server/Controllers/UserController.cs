@@ -38,6 +38,19 @@ namespace GrechMotorsPrd.Server.Controllers
             return Ok(miobjeto);
         }
 
+        // GET: api/UnitPieceCode/getUnitPieceByIdentificationCode/{qr_code_number}
+        [HttpGet]
+        [Route("getUserByUserNumber/{userNumber}")]
+        public async Task<ActionResult<List<UserModel>>> GetUserByUserNumber(string userNumber)
+        {
+            var miobjeto = await _context.users.FirstOrDefaultAsync(ob => ob.user_number == userNumber);
+            if (miobjeto == null)
+            {
+                return NotFound(" :/");
+            }
+            return Ok(miobjeto);
+        }
+
         [HttpPost]
         public async Task<ActionResult<UserModel>> CreateUser(UserModel objeto)
         {

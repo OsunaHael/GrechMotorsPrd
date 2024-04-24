@@ -24,6 +24,8 @@ namespace GrechMotorsPrd.Server.Data
         public DbSet<UserFurnitureModel> usersfurnitures { get; set; } // DbSet para el modelo UserFurnitureModel
         public DbSet<UnitPieceCodeModel> unitspiecescodes { get; set; } // DbSet para el modelo UnitsPiecesCodesModel
         public DbSet<UnitFurnitureCodeModel> unitsfurniturescodes { get; set; } // DbSet para el modelo UnitsFurnituresCodesModel
+        public DbSet<PieceStatusHistory> piecestatushistories { get; set; } // DbSet para el modelo PieceStatusHistory
+        public DbSet<FurnitureStatusHistory> furniturestatushistories { get; set; } // DbSet para el modelo FurnitureStatusHistory
 
         // Método para configurar las relaciones de las entidades en la base de datos
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -98,12 +100,12 @@ namespace GrechMotorsPrd.Server.Data
             //Relacion muchos a muchos entre UnitModel y PieceModel a través de UnitPieceCodeModel
             modelBuilder.Entity<UnitPieceCodeModel>()
                 .HasKey(upc => new { upc.unit_id, upc.piece_id }); // Definir clave compuesta
-            
+
             modelBuilder.Entity<UnitPieceCodeModel>()
                 .HasOne(upc => upc.Unit) // Una relación unidad tiene una unidad
                 .WithMany(u => u.UnitPiecesCodes) // Una unidad tiene muchas relaciones unidad-pieza
                 .HasForeignKey(upc => upc.unit_id); // Clave foránea de unidad es unit_id
-            
+
             modelBuilder.Entity<UnitPieceCodeModel>()
                 .HasOne(upc => upc.Piece) // Una relación unidad tiene una pieza
                 .WithMany(p => p.UnitPiecesCodes) // Una pieza tiene muchas relaciones unidad-pieza
@@ -122,6 +124,48 @@ namespace GrechMotorsPrd.Server.Data
                 .HasOne(ufc => ufc.Furniture) // Una relación unidad tiene un mueble
                 .WithMany(f => f.UnitFurnituresCodes) // Un mueble tiene muchas relaciones unidad-mueble
                 .HasForeignKey(ufc => ufc.furniture_id); // Clave foránea de mueble es furniture_id
+
+            // Relación muchos a muchos entre PieceStatusHistory y las otras entidades
+            modelBuilder.Entity<PieceStatusHistory>()
+                .HasKey(psh => psh.id); // Definir clave primaria
+
+            modelBuilder.Entity<PieceStatusHistory>()
+                .HasOne(psh => psh.Piece) // Una relación historial de estado de pieza tiene una pieza
+                .WithMany(p => p.PieceStatusHistories) // Una pieza tiene muchos historiales de estado de pieza
+                .HasForeignKey(psh => psh.piece_id); // Clave foránea de pieza es piece_id
+            
+            modelBuilder.Entity<PieceStatusHistory>()
+                .HasOne(psh => psh.Furniture) // Una relación historial de estado de pieza tiene un mueble
+                .WithMany(f => f.PieceStatusHistories) // Un mueble tiene muchos historiales de estado de pieza
+                .HasForeignKey(psh => psh.furniture_id); // Clave foránea de mueble es furniture_id
+
+            modelBuilder.Entity<PieceStatusHistory>()
+                .HasOne(psh => psh.User) // Una relación historial de estado de pieza tiene un usuario
+                .WithMany(u => u.PieceStatusHistories) // Un usuario tiene muchos historiales de estado de pieza
+                .HasForeignKey(psh => psh.user_id); // Clave foránea de usuario es user_id
+
+            modelBuilder.Entity<PieceStatusHistory>()
+                .HasOne(psh => psh.Unit) // Una relación historial de estado de pieza tiene una unidad
+                .WithMany(u => u.PieceStatusHistories) // Una unidad tiene muchos historiales de estado de pieza
+                .HasForeignKey(psh => psh.unit_id); // Clave foránea de unidad es unit_id
+
+            modelBuilder.Entity<FurnitureStatusHistory>()
+                .HasKey(fsh => fsh.id); // Definir clave primaria
+
+            modelBuilder.Entity<FurnitureStatusHistory>()
+                .HasOne(fsh => fsh.Furniture) // Una relación historial de estado de mueble tiene un mueble
+                .WithMany(f => f.FurnitureStatusHistories) // Un mueble tiene muchos historiales de estado de mueble
+                .HasForeignKey(fsh => fsh.furniture_id); // Clave foránea de mueble es furniture_id
+
+            modelBuilder.Entity<FurnitureStatusHistory>()
+                .HasOne(fsh => fsh.User) // Una relación historial de estado de mueble tiene un usuario
+                .WithMany(u => u.FurnitureStatusHistories) // Un usuario tiene muchos historiales de estado de mueble
+                .HasForeignKey(fsh => fsh.user_id); // Clave foránea de usuario es user_id
+
+            modelBuilder.Entity<FurnitureStatusHistory>()
+                .HasOne(fsh => fsh.Unit) // Una relación historial de estado de mueble tiene una unidad
+                .WithMany(u => u.FurnitureStatusHistories) // Una unidad tiene muchos historiales de estado de mueble
+                .HasForeignKey(fsh => fsh.unit_id); // Clave foránea de unidad es unit_id
         }
     }
 }

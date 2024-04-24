@@ -60,6 +60,24 @@ namespace GrechMotorsPrd.Server.Controllers
             return Ok(miobjeto.piece_id);
         }
 
+        // GET: api/FurniturePiece/getFurnitureByPieceId/{piece_id}
+        [HttpGet]
+        [Route("getFurnitureByPieceId/{piece_id}")]
+        public async Task<ActionResult<List<int>>> GetFurnitureByPieceId(int piece_id)
+        {
+            var furniturePieces = await _context.furniturespieces
+                .Where(ob => ob.piece_id == piece_id)
+                .Select(ob => ob.furniture_id)
+                .ToListAsync();
+
+            if (furniturePieces.Count == 0)
+            {
+                return NotFound(" :/");
+            }
+
+            return Ok(furniturePieces);
+        }
+
         // GET: api/FurniturePiece/getPiecesByFurnitureId/{id}
         [HttpGet]
         [Route("getPiecesByFurnitureId/{furniture_id}")]

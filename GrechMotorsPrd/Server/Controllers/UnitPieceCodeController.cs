@@ -40,15 +40,15 @@ namespace GrechMotorsPrd.Server.Controllers
 
         // GET: api/UnitPieceCode/getUnitPieceByIdentificationCode/{qr_code_number}
         [HttpGet]
-        [Route("getUnitPieceByIdentificationCode/{qr_code_number}")]
-        public async Task<ActionResult<List<UnitPieceCodeModel>>> GetUnitPieceByIdentificationCode(string qr_code_number)
+        [Route("getUnitPieceByIdentificationCode/{qr_code}")]
+        public async Task<ActionResult<List<UnitPieceCodeModel>>> GetUnitPieceByIdentificationCode(string qr_code)
         {
-            var miobjeto = await _context.unitspiecescodes.FirstOrDefaultAsync(ob => ob.qr_code_number == qr_code_number);
+            var miobjeto = await _context.unitspiecescodes.FirstOrDefaultAsync(ob => ob.qr_code_number == qr_code);
             if (miobjeto == null)
             {
                 return NotFound(" :/");
             }
-            return Ok(miobjeto);     
+            return Ok(miobjeto);
         }
 
         //Get: api/UnitPieceCode/getPiecesQrIdentificationCodesByUnit/{unit_id}
