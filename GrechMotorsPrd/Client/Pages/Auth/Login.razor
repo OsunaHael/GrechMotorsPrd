@@ -1,0 +1,59 @@
+﻿@page "/login"
+
+@using GrechMotorsPrd.Client.Auth
+@using GrechMotorsPrd.Client.Repository
+@using GrechMotorsPrd.Shared.Models
+
+@inject SweetAlertService Swal
+@inject ILoginService loginService
+@inject IRepository repository
+@inject NavigationManager navigationManager
+
+<div class="container vh-100 d-flex justify-content-center align-items-center">
+    <div class="col-lg-8 col-md-10 col-sm-12">
+        <div class="bg-white rounded-3 p-4 shadow-lg">
+            <h1>Login</h1>
+            <div class="m-3">
+                <EditForm Model="userModel" OnValidSubmit="UserLogin">
+                    <DataAnnotationsValidator />
+                    <div class="mb-3">
+                        <label>Email:</label>
+                        <div>
+                            <InputText class="form-control" @bind-Value="userModel.email" />
+                            <ValidationMessage For="@(() => userModel.email)" />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Password:</label>
+                        <div>
+                            <InputText type="password" class="form-control" @bind-Value="userModel.pwd" />
+                            <ValidationMessage For="@(() => userModel.pwd)" />
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private UserModel userModel = new UserModel();
+
+    private async Task UserLogin()
+    {
+        var httpResponse = await repository.Post<UserModel, UserToken>("api/Account/login", userModel);
+        if (httpResponse.Error)
+        {
+            var errorMessage = await httpResponse.GetErrorMessage();
+            await Swal.FireAsync("Error", errorMessage, SweetAlertIcon.Error);
+        }
+        else
+        {
+            await loginService.Login(httpResponse.Response!.Token);
+            navigationManager.NavigateTo("");
+        }
+    }
+}

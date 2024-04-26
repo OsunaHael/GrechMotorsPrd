@@ -1,16 +1,20 @@
 using CurrieTechnologies.Razor.SweetAlert2;
 using GrechMotorsPrd.Client;
 using GrechMotorsPrd.Client.Auth;
+using GrechMotorsPrd.Client.Repository;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using QRCoder;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-builder.Services.AddSingleton(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+builder.Services.AddSingleton(sp => new HttpClient 
+{ 
+    BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) 
+});
+
 ConfigureServices(builder.Services);
 
 // Registra QrCodeGenerator como un servicio
@@ -21,6 +25,13 @@ await builder.Build().RunAsync();
 void ConfigureServices(IServiceCollection services)
 {
     services.AddSweetAlert2();
+    services.AddScoped<IRepository, Repository>();
     services.AddAuthorizationCore();
-    services.AddScoped<AuthenticationStateProvider, AuthProviderTest>();
+    
+    services.AddScoped<JwtAuthProvider>();
+    services.AddScoped<AuthenticationStateProvider, JwtAuthProvider>(provider => 
+        provider.GetRequiredService<JwtAuthProvider>());
+
+    services.AddScoped<ILoginService, JwtAuthProvider>(provider => 
+        provider.GetRequiredService<JwtAuthProvider>());
 }

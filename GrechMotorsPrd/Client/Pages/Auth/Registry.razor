@@ -1,0 +1,52 @@
+﻿@page "/registry"
+
+@using GrechMotorsPrd.Client.Auth
+@using GrechMotorsPrd.Client.Repository
+@using GrechMotorsPrd.Shared.Models
+
+@inject SweetAlertService Swal
+@inject ILoginService loginService
+@inject IRepository repository
+@inject NavigationManager navigationManager
+
+<h3>Registry</h3>
+
+<EditForm Model="userModel" OnValidSubmit="CreateUser">
+    <DataAnnotationsValidator />
+    <div class="mb-3">
+        <label>Email:</label>
+        <div>
+            <InputText class="form-control" @bind-Value="userModel.email" />
+            <ValidationMessage For="@(() => userModel.email)" />
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label>Password:</label>
+        <div>
+            <InputText type="password" class="form-control" @bind-Value="userModel.pwd" />
+            <ValidationMessage For="@(() => userModel.pwd)" />
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Registrar</button>
+</EditForm>
+
+@code {
+    private UserModel userModel = new UserModel();
+
+    private async Task CreateUser()
+    {
+        var httpResponse = await repository.Post<UserModel, UserToken>("api/Account/create", userModel);
+        if(httpResponse.Error)
+        {
+            var errorMessage = await httpResponse.GetErrorMessage();
+            await Swal.FireAsync("Error", errorMessage, SweetAlertIcon.Error);
+        }
+        else
+        {
+            await loginService.Login(httpResponse.Response!.Token);
+            navigationManager.NavigateTo("");
+        }
+    }
+}

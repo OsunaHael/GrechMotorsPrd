@@ -8,7 +8,15 @@ namespace GrechMotorsPrd.Client.Auth
         public async override Task<AuthenticationState> GetAuthenticationStateAsync()
         {
             var anonimo = new ClaimsIdentity();
-            return await Task.FromResult(new AuthenticationState(new ClaimsPrincipal(anonimo)));
+            var usuarioPlanner = new ClaimsIdentity(
+                new List<Claim>
+                {
+                    new Claim(ClaimTypes.Role, "Planner"),
+                    new Claim("NumeroEmpleado", "4645"),
+                    new Claim(ClaimTypes.Name, "Esthefania"),
+                },
+                authenticationType: "prueba");
+            return await Task.FromResult(new AuthenticationState(new ClaimsPrincipal(usuarioPlanner)));
         }
     }
 }

@@ -1,11 +1,12 @@
 ﻿// Importamos los modelos necesarios y el espacio de nombres de Entity Framework Core
 using GrechMotorsPrd.Shared.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace GrechMotorsPrd.Server.Data
 {
     // Definición de la clase ApplicationDbContext que hereda de DbContext
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext
     {
         // Constructor que acepta DbContextOptions y lo pasa al constructor base
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
