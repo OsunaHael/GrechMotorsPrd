@@ -10,7 +10,7 @@ namespace GrechMotorsPrd.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class FurnitureStatusHistoryController : ControllerBase
     { 
         private readonly ApplicationDbContext _context;
