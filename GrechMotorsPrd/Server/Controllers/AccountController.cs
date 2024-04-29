@@ -1,9 +1,11 @@
-﻿using GrechMotorsPrd.Shared.Models;
+﻿using GrechMotorsPrd.Server.Data;
+using GrechMotorsPrd.Shared.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -15,25 +17,38 @@ namespace GrechMotorsPrd.Server.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly UserManager<IdentityUser> userManager;
-        private readonly SignInManager<IdentityUser> signInManager;
+        private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> userManager;
+        private readonly SignInManager<ApplicationUser> signInManager;
         private readonly IConfiguration configuration;
 
-        public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, IConfiguration configuration)
+        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration, ApplicationDbContext _context)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.configuration = configuration;
+            this._context = _context;
         }
 
         [HttpPost("create")]
         public async Task<ActionResult<UserToken>> CreateUser([FromBody] UserModel userModel)
         {
-            var user = new IdentityUser { UserName = userModel.email, Email = userModel.email };
-            var result = await userManager.CreateAsync(user, userModel.pwd);
+            var user = new ApplicationUser { UserName = userModel.email, Email = userModel.email };
+            var result = await userManager.CreateAsync(user, userModel.pwd!);
             if (result.Succeeded)
             {
-                return BuildToken(userModel);
+                // Crear un nuevo UserModel con la información del ApplicationUser
+                var newUserModel = new UserModel
+                {
+                    identityUserId = user.Id,
+                    ApplicationUser = user,
+                    // Copia las otras propiedades que necesites...
+                };
+
+                _context.users.Add(newUserModel);
+                await _context.SaveChangesAsync();
+
+                return await BuildToken(newUserModel); // Pasar el objeto newUserModel a BuildToken
             }
             else
             {
@@ -41,13 +56,15 @@ namespace GrechMotorsPrd.Server.Controllers
             }
         }
 
+
+
         [HttpPost("Login")]
         public async Task<ActionResult<UserToken>> Login([FromBody] UserModel userModel)
         {
-            var result = await signInManager.PasswordSignInAsync(userModel.email, userModel.pwd, isPersistent: false, lockoutOnFailure: false);
+            var result = await signInManager.PasswordSignInAsync(userModel.email!, userModel.pwd!, isPersistent: false, lockoutOnFailure: false);
             if (result.Succeeded)
             {
-                return BuildToken(userModel);
+                return await BuildToken(userModel);
             }
             else
             {
@@ -55,13 +72,22 @@ namespace GrechMotorsPrd.Server.Controllers
             }
         }
 
-        private UserToken BuildToken(UserModel userModel)
+        private async Task<UserToken> BuildToken(UserModel userModel)
         {
             var claims = new List<Claim>()
             {
                 new Claim(ClaimTypes.Name, userModel.email),
                 new Claim("miValor", "Lo que yo quiera"),
             };
+
+            var user = await userManager.FindByEmailAsync(userModel.email);
+            var roles = await userManager.GetRolesAsync(user!);
+            
+            foreach (var rol in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, rol));
+            }
+
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["jwtkey"]!));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var expiration = DateTime.UtcNow.AddDays(1);

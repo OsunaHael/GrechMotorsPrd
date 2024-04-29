@@ -9,6 +9,7 @@ namespace GrechMotorsPrd.Shared.Models
     public class UserModel
     {
         public int id { get; set; }
+        public int identityUserId { get; set; }
         public string? user_number { get; set; }
         public string? username { get; set; }
         public string? pwd { get; set; }
@@ -19,6 +20,7 @@ namespace GrechMotorsPrd.Shared.Models
         public DateTime deleted_at { get; set; }
 
         // Propiedades de navegación
+        public ApplicationUser ApplicationUser { get; set; }
         public List<UnitModel>? Unit { get; set; } // Relación uno a muchos con UnitModel
         public List<UserPieceModel>? UserPieces { get; set; } // Propiedad de navegación para la relación muchos a muchos con UserPieceModel
         public List<UserFurnitureModel>? UserFurnitures { get; set; } // Propiedad de navegación para la relación muchos a muchos con UserFurnitureModel

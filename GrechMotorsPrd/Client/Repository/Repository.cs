@@ -19,6 +19,20 @@ namespace GrechMotorsPrd.Client.Repository
                 PropertyNameCaseInsensitive = true 
             };
 
+        public async Task<HttpResponseWrapper<T>> Get<T>(string url)
+        {
+            var httpResponse = await httpClient.GetAsync(url);
+            if(httpResponse.IsSuccessStatusCode)
+            {
+                var response = await DeserializeResponse<T>(httpResponse, defaultJsonSerializerOptions);
+                return new HttpResponseWrapper<T>(response, error:false, httpResponse);
+            }
+            else
+            {
+                return new HttpResponseWrapper<T>(default, error:true, httpResponse);
+            }
+        }
+
         public async Task<HttpResponseWrapper<object>> Post<T>(string url, T sendObject)
         {
             var sendObjectJson = JsonSerializer.Serialize(sendObject);

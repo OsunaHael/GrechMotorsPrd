@@ -3,6 +3,7 @@ using GrechMotorsPrd.Shared.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,17 +15,26 @@ namespace GrechMotorsPrd.Server.Controllers
     public class UserController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> userManager;
 
-        public UserController(ApplicationDbContext context)
+        public UserController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
 
             _context = context;
+            this.userManager = userManager;
         }
 
         [HttpGet]
         public async Task<ActionResult<List<UserModel>>> GetUser()
         {
             var lista = await _context.users.ToListAsync();
+            return Ok(lista);
+        }
+
+        [HttpGet("roles")]
+        public async Task<ActionResult<List<RolModel>>> GetRoles()
+        {
+            var lista = await _context.Roles.Select(x => new RolModel { roleName = x.Name!}).ToListAsync();
             return Ok(lista);
         }
 
@@ -57,10 +67,45 @@ namespace GrechMotorsPrd.Server.Controllers
         [HttpPost]
         public async Task<ActionResult<UserModel>> CreateUser(UserModel objeto)
         {
+            // Crear un nuevo ApplicationUser
+            var applicationUser = new ApplicationUser
+            {
+                Id = objeto.identityUserId,
+                Email = objeto.email,
+
+            };
+
+            // Asignar el ApplicationUser al UserModel
+            objeto.ApplicationUser = applicationUser;
 
             _context.users.Add(objeto);
             await _context.SaveChangesAsync();
             return Ok(await GetDbUser());
+        }
+
+
+        [HttpPost("assignRole")]
+        public async Task<ActionResult<UserModel>> AssignUserRole(EditRolModel objeto)
+        {
+            var user = await userManager.FindByIdAsync(objeto.user_id.ToString());
+            if (user is null)
+            {
+                return BadRequest("The user doesn't exist");
+            }
+            await userManager.AddToRoleAsync(user, objeto.role);
+            return NoContent();
+        }
+
+        [HttpPost("removeRole")]
+        public async Task<ActionResult<UserModel>> RemoveUserRole(EditRolModel objeto)
+        {
+            var user = await userManager.FindByIdAsync(objeto.user_id.ToString());
+            if (user is null)
+            {
+                return BadRequest("The user doesn't exist");
+            }
+            await userManager.RemoveFromRoleAsync(user, objeto.role);
+            return NoContent();
         }
 
         [HttpPut("{id}/username")]
