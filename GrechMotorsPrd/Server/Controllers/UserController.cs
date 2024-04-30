@@ -67,22 +67,17 @@ namespace GrechMotorsPrd.Server.Controllers
         [HttpPost]
         public async Task<ActionResult<UserModel>> CreateUser(UserModel objeto)
         {
-            // Crear un nuevo ApplicationUser
-            var applicationUser = new ApplicationUser
+            try
             {
-                Id = objeto.identityUserId,
-                Email = objeto.email,
-
-            };
-
-            // Asignar el ApplicationUser al UserModel
-            objeto.ApplicationUser = applicationUser;
-
-            _context.users.Add(objeto);
-            await _context.SaveChangesAsync();
-            return Ok(await GetDbUser());
+                _context.users.Add(objeto);
+                await _context.SaveChangesAsync();
+                return Ok(objeto);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
-
 
         [HttpPost("assignRole")]
         public async Task<ActionResult<UserModel>> AssignUserRole(EditRolModel objeto)

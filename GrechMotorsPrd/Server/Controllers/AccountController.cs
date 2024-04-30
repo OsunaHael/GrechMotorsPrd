@@ -30,33 +30,34 @@ namespace GrechMotorsPrd.Server.Controllers
             this._context = _context;
         }
 
+        // GET: api/Account/getLastUserId
+        [HttpGet]
+        [Route("getLastUserId")]
+        public async Task<ActionResult<int>> GetLastUserId()
+        {
+            var lastUser = await userManager.Users.OrderByDescending(u => u.Id).FirstOrDefaultAsync();
+            if (lastUser == null)
+            {
+                return NotFound("No users found.");
+            }
+            return Ok(lastUser.Id);
+        }
+
+
         [HttpPost("create")]
         public async Task<ActionResult<UserToken>> CreateUser([FromBody] UserModel userModel)
         {
-            var user = new ApplicationUser { UserName = userModel.email, Email = userModel.email };
+            var user = new ApplicationUser { UserName = userModel.username, Email = userModel.email };
             var result = await userManager.CreateAsync(user, userModel.pwd!);
             if (result.Succeeded)
             {
-                // Crear un nuevo UserModel con la información del ApplicationUser
-                var newUserModel = new UserModel
-                {
-                    identityUserId = user.Id,
-                    ApplicationUser = user,
-                    // Copia las otras propiedades que necesites...
-                };
-
-                _context.users.Add(newUserModel);
-                await _context.SaveChangesAsync();
-
-                return await BuildToken(newUserModel); // Pasar el objeto newUserModel a BuildToken
+                return await BuildToken(userModel); // Pasar el objeto userModel a BuildToken
             }
             else
             {
                 return BadRequest(result.Errors.First());
             }
         }
-
-
 
         [HttpPost("Login")]
         public async Task<ActionResult<UserToken>> Login([FromBody] UserModel userModel)
@@ -76,11 +77,11 @@ namespace GrechMotorsPrd.Server.Controllers
         {
             var claims = new List<Claim>()
             {
-                new Claim(ClaimTypes.Name, userModel.email),
+                new Claim(ClaimTypes.Name, userModel.username!),
                 new Claim("miValor", "Lo que yo quiera"),
             };
 
-            var user = await userManager.FindByEmailAsync(userModel.email);
+            var user = await userManager.FindByEmailAsync(userModel.email!);
             var roles = await userManager.GetRolesAsync(user!);
             
             foreach (var rol in roles)

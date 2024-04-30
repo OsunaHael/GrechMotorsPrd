@@ -43,10 +43,6 @@ namespace GrechMotorsPrd.Server.Data
                 .WithMany(u => u.Unit) // Un usuario tiene muchas unidades
                 .HasForeignKey(m => m.user_id); // Clave foránea de la unidad es user_id
 
-            modelBuilder.Entity<UserModel>()
-                .HasOne(u => u.ApplicationUser) // UserModel tiene un ApplicationUser
-                .WithOne(a => a.User) // ApplicationUser tiene un UserModel
-                .HasForeignKey<UserModel>(u => u.identityUserId); // IdentityUserId es la clave foránea
             // Relación muchos a muchos entre UserModel y PieceModel a través de una tabla intermedia
             modelBuilder.Entity<UserPieceModel>()
                 .HasKey(up => new { up.user_id, up.piece_id }); // Definir clave compuesta

@@ -11,7 +11,53 @@
 
 <h3>Registry</h3>
 
-<EditForm Model="userModel" OnValidSubmit="CreateUser">
+<div class="container vh-100 d-flex justify-content-center align-items-center mb-3">
+    <div class="col-lg-8 col-md-10 col-sm-12">
+        <div class="bg-white rounded-3 p-4 shadow-lg">
+            <h1>Registro de Usuarios</h1>
+            <div class="m-3">
+                <EditForm Model="userModel" OnValidSubmit="CreateUser">
+                    <DataAnnotationsValidator />
+                    <div class="row m-3">
+                        <div class="col">
+                            <label>Nombre y Apellido:</label>
+                            <InputText class="form-control" @bind-Value="userModel.username"></InputText>
+                            <ValidationMessage For="@(() => userModel.username)"></ValidationMessage>
+                        </div>
+                        <div class="col">
+                            <label>Numero de Empleado:</label>
+                            <InputText class="form-control" @bind-Value="userModel.user_number"></InputText>
+                            <ValidationMessage For="@(() => userModel.user_number)"></ValidationMessage>
+                        </div>
+                    </div>
+                    <div class="row m-3">
+                        <div class="col">
+                            <label>Correo:</label>
+                            <div>
+                                <InputText class="form-control" @bind-Value="userModel.email" />
+                                <ValidationMessage For="@(() => userModel.email)" />
+                            </div>
+                        </div>
+                        <div class="col">
+                            <label>Contraseña:</label>
+                            <div>
+                                <InputText type="password" class="form-control" @bind-Value="userModel.pwd" />
+                                <ValidationMessage For="@(() => userModel.pwd)" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row m-3">
+                        <div class="col">
+                            <button type="submit" class="btn btn-primary">Registrar</button>
+                        </div>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* <EditForm Model="userModel" OnValidSubmit="CreateUser">
     <DataAnnotationsValidator />
     <div class="mb-3">
         <label>Email:</label>
@@ -30,23 +76,71 @@
     </div>
 
     <button type="submit" class="btn btn-primary">Registrar</button>
-</EditForm>
+</EditForm> *@
 
 @code {
     private UserModel userModel = new UserModel();
 
+    // private async Task CreateUser()
+    // {
+    //     var httpResponse = await repository.Post<UserModel, UserToken>("api/Account/create", userModel);
+    //     if(httpResponse.Error)
+    //     {
+    //         var errorMessage = await httpResponse.GetErrorMessage();
+    //         await Swal.FireAsync("Error", errorMessage, SweetAlertIcon.Error);
+    //     }
+    //     else
+    //     {
+    //         await loginService.Login(httpResponse.Response!.Token);
+    //         navigationManager.NavigateTo("");
+    //     }
+    // }
+
     private async Task CreateUser()
     {
         var httpResponse = await repository.Post<UserModel, UserToken>("api/Account/create", userModel);
-        if(httpResponse.Error)
+        if (httpResponse.Error)
         {
             var errorMessage = await httpResponse.GetErrorMessage();
             await Swal.FireAsync("Error", errorMessage, SweetAlertIcon.Error);
         }
         else
         {
-            await loginService.Login(httpResponse.Response!.Token);
-            navigationManager.NavigateTo("");
+            var userToken = httpResponse.Response;
+            // Hacer una solicitud GET para obtener el ID del último usuario
+            var httpResponseGetLastUserId = await repository.Get<int>("api/Account/getLastUserId");
+
+            if (httpResponseGetLastUserId.Error)
+            {
+                var errorMessage = await httpResponseGetLastUserId.GetErrorMessage();
+                await Swal.FireAsync("Error", errorMessage, SweetAlertIcon.Error);
+            }
+            else
+            {
+                var userId = httpResponseGetLastUserId.Response;
+                userModel.identityUserId = userId;
+                var httpResponseUser = await repository.Post<UserModel>("api/User", userModel);
+                if (httpResponseUser.Error)
+                {
+                    var errorMessage = await httpResponse.GetErrorMessage();
+                    await Swal.FireAsync("Error", errorMessage, SweetAlertIcon.Error);
+                }
+                else
+                {
+                    // Comprobar si userToken es null antes de acceder a su propiedad Token
+                    if (userToken?.Token != null)
+                    {
+                        await loginService.Login(userToken.Token);
+                    }
+                    else
+                    {
+                        // Manejar el caso en que userToken es null
+                        await Swal.FireAsync("Error", "Hubo un error inesperado, para pedir ayuda vaya a la sección de Ayuda", SweetAlertIcon.Error);
+                    }
+                    navigationManager.NavigateTo("");
+                }
+            }
         }
     }
+
 }
