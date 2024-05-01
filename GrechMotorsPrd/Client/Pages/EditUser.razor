@@ -29,7 +29,7 @@ else
 
 @code {
     [Parameter]
-    public int userId { get; set; }
+    public string userId { get; set; }
     private List<RolModel>? roles;
     private string selectedRole = "";
 
@@ -67,7 +67,7 @@ else
 
         var rol = new EditRolModel
         {
-            user_id = userId,
+            user_id = Convert.ToInt32(userId),
             role = selectedRole
         };
 

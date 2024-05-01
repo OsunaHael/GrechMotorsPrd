@@ -77,8 +77,8 @@ namespace GrechMotorsPrd.Server.Controllers
         {
             var claims = new List<Claim>()
             {
+                new Claim(ClaimTypes.Email, userModel.email!),
                 new Claim(ClaimTypes.Name, userModel.username!),
-                new Claim("miValor", "Lo que yo quiera"),
             };
 
             var user = await userManager.FindByEmailAsync(userModel.email!);
