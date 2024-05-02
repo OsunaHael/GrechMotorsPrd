@@ -1,0 +1,86 @@
+﻿@page "/user/edit/{userId}"
+@using GrechMotorsPrd.Client.Repository
+@using GrechMotorsPrd.Shared.Models
+
+@inject IRepository repository
+@inject SweetAlertService swal
+
+<h3>EditUser</h3>
+
+@if(roles is null)
+{
+    <p>Cargando...</p>
+}
+else
+{
+    <div class="form-group">
+        <label for="role">Rol</label>
+        <select class="form-select mb-2" @bind="selectedRole">
+            <option value="">Seleccione un rol</option>
+            @foreach (var rol in roles)
+            {
+                <option value="@rol.roleName">@rol.roleName</option>
+            }
+        </select>
+        <button class="btn btn-primary" @onclick="AssignRol">Asignar Rol</button>
+        <button class="btn btn-danger" @onclick="RemoveRol">Remover Rol</button>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string userId { get; set; }
+    private List<RolModel>? roles;
+    private string selectedRole = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var httpResponse = await repository.Get<List<RolModel>>("api/user/roles");
+        if(httpResponse.Error)
+        {
+            var errorMessage = await httpResponse.GetErrorMessage();
+            await swal.FireAsync("Error", errorMessage, SweetAlertIcon.Error);
+        }
+        else
+        {
+            roles = httpResponse.Response;
+        }
+    }
+
+    private async Task AssignRol()
+    {
+        await EditRol($"api/user/assignRole");
+    }
+
+    private async Task RemoveRol()
+    {
+        await EditRol($"api/user/removeRole");
+    }
+
+    private async Task EditRol(string url)
+    {
+        if(selectedRole == "0")
+        {
+            await swal.FireAsync("Error", "Seleccione un rol", SweetAlertIcon.Error);
+            return;
+        }
+
+        var rol = new EditRolModel
+        {
+            user_id = Convert.ToInt32(userId),
+            role = selectedRole
+        };
+
+        var httpResponse = await repository.Post<EditRolModel>(url, rol);
+
+        if(httpResponse.Error)
+        {
+            var errorMessage = await httpResponse.GetErrorMessage();
+            await swal.FireAsync("Error", errorMessage, SweetAlertIcon.Error);
+        }
+        else
+        {
+            await swal.FireAsync("Exitoso", "Operacion realizada con exito", SweetAlertIcon.Success);
+        }
+    }
+}

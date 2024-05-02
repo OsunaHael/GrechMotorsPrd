@@ -1,5 +1,7 @@
 ﻿using GrechMotorsPrd.Server.Data;
 using GrechMotorsPrd.Shared.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +10,7 @@ namespace GrechMotorsPrd.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class FurnitureController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -36,6 +39,32 @@ namespace GrechMotorsPrd.Server.Controllers
             return Ok(miobjeto);
         }
 
+        [HttpGet]
+        [Route("getFurnitureById/{id}")]
+        public async Task<ActionResult<List<FurnitureModel>>> GetFurnitureById(int id)
+        {
+            var miobjeto = await _context.furnitures.FirstOrDefaultAsync(ob => ob.id == id);
+            if (miobjeto == null)
+            {
+                return NotFound(" :/");
+            }
+            return Ok(miobjeto);
+        }
+
+        // GET: api/Furniture/getFurnituresById/{unit_id}
+        [HttpGet]
+        [Route("getFurnituresById/{id}")]
+        public async Task<ActionResult<List<FurnitureModel>>> GetFurnituresById(int id)
+        {
+            // Retrieve all units from the database that match the provided model name
+            var furnitures = await _context.furnitures.Where(ob => ob.id == id).ToListAsync();
+            if (furnitures == null || furnitures.Count == 0)
+            {
+                return NotFound(" :/");
+            }
+            return Ok(furnitures);
+        }
+
         [HttpPost]
         public async Task<ActionResult<FurnitureModel>> CreateFurniture(FurnitureModel objeto)
         {
@@ -46,6 +75,18 @@ namespace GrechMotorsPrd.Server.Controllers
 
         [HttpPut("{id}/status")]
         public async Task<ActionResult<List<FurnitureModel>>> UpdateFurnitureStatus(FurnitureModel objeto)
+        {
+            var DbObjeto = await _context.furnitures.FindAsync(objeto.id);
+            if (DbObjeto == null)
+                return BadRequest("no se encuentra");
+            DbObjeto.furniture_status = objeto.furniture_status;
+            objeto.updated_at = DateTime.Now;
+            await _context.SaveChangesAsync();
+            return Ok(await _context.furnitures.ToListAsync());
+        }
+
+        [HttpPut("{id}/qrIdentificationCode")]
+        public async Task<ActionResult<List<FurnitureModel>>> UpdateFurnitureQrIdentificationCode(FurnitureModel objeto)
         {
             var DbObjeto = await _context.furnitures.FindAsync(objeto.id);
             if (DbObjeto == null)

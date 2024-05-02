@@ -10,7 +10,6 @@ namespace GrechMotorsPrd.Shared.Models
     {
         public int id { get; set; }
         public int piece_number { get; set; }
-        public int qrIdentificationCode { get; set; }
         public string? piece_status { get; set; }
         public string? comments { get; set; }
         public DateTime created_at { get; set; } = DateTime.Now;
@@ -24,5 +23,7 @@ namespace GrechMotorsPrd.Shared.Models
         // Propiedades de navegación
         public List<FurniturePieceModel>? FurniturePieces { get; set; } //Relacion Muchos a Muchos con FurnitureModel
         public List<UserPieceModel>? UserPieces { get; set; } //Relacion Muchos a Muchos con UserModel
+        public List<UnitPieceCodeModel>? UnitPiecesCodes { get; set; } //Relacion Muchos a Muchos con UnitModel
+        public List<PieceStatusHistory>? PieceStatusHistories { get; set; } //Relacion Uno a Muchos con PieceStatusHistory
     }
 }

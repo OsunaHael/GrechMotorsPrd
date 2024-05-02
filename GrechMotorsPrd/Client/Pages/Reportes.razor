@@ -1,0 +1,99 @@
+﻿@page "/reportes"
+
+<PageTitle>Reportes</PageTitle>
+
+<div class="container vh-100 d-flex justify-content-center align-items-center">
+    <div class="col-lg-8 col-md-10 col-sm-12">
+        <div class="bg-white rounded-3 p-4 shadow-lg">
+            <div class="row">
+                <div class="col">
+                    <h1>Reporte de Fallas</h1>
+                    <p>Ingresa un rango de fechas:</p>
+                </div>
+                <div class="col align-content-end">
+                    <button type="submit" class="btn btn-success rounded-3">Descargar archivo</button>
+                </div>
+            </div>
+            <div class="m-3">
+                <div class="row">
+                    <h3>De:</h3>
+                </div>
+                <div class="row m-3">
+                    <div class="col">
+
+                        <label for="fechaInicio" class="form-label">Fecha de Inicio</label>
+                        <InputDate @bind-Value="fechaInicio" id="fechaInicio" class="form-control" />
+                    </div>
+                    <div class="col">
+                        <label for="horaInicio" class="form-label">Hora de Inicio</label>
+                        <select class="form-select" aria-label="horaInicio" id="horaInicio">
+                            <option selected></option>
+                            <option value="1">7:00</option>
+                            <option value="2">8:00</option>
+                            <option value="3">9:00</option>
+                            <option value="4">10:00</option>
+                            <option value="5">11:00</option>
+                            <option value="6">12:00</option>
+                            <option value="7">13:00</option>
+                            <option value="8">14:00</option>
+                            <option value="9">15:00</option>
+                            <option value="10">16:00</option>
+                            <option value="11">17:00</option>
+                            <option value="11">18:00</option>
+                            <option value="11">19:00</option>
+                            <option value="11">20:00</option>
+                            <option value="11">21:00</option>
+                            <option value="11">22:00</option>
+                            <option value="11">23:00</option>
+                            <option value="11">24:00</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <h3>A:</h3>
+                </div>
+                <div class="row m-3">
+                    <div class="col">
+
+                        <label for="fechaFin" class="form-label">Fecha de Finalización</label>
+                        <InputDate @bind-Value="fechaFin" id="fechaFin" class="form-control" />
+                    </div>
+                    <div class="col">
+                        <label for="horaFin" class="form-label">Hora de Finalización</label>
+                        <select class="form-select" aria-label="horaFin" id="HoraFin">
+                            <option selected></option>
+                            <option value="1">7:00</option>
+                            <option value="2">8:00</option>
+                            <option value="3">9:00</option>
+                            <option value="4">10:00</option>
+                            <option value="5">11:00</option>
+                            <option value="6">12:00</option>
+                            <option value="7">13:00</option>
+                            <option value="8">14:00</option>
+                            <option value="9">15:00</option>
+                            <option value="10">16:00</option>
+                            <option value="11">17:00</option>
+                            <option value="11">18:00</option>
+                            <option value="11">19:00</option>
+                            <option value="11">20:00</option>
+                            <option value="11">21:00</option>
+                            <option value="11">22:00</option>
+                            <option value="11">23:00</option>
+                            <option value="11">24:00</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <button class="btn btn-primary rounded-3">Buscar reporte</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private DateTime fechaInicio { get; set; } = DateTime.Today;
+    private DateTime fechaFin { get; set; } = DateTime.Today;
+}
