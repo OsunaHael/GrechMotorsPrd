@@ -1,0 +1,37 @@
+﻿@page "/wip"
+
+<PageTitle>Work In Progress</PageTitle>
+
+<div class="container vh-100 d-flex justify-content-center align-items-center">
+    <div class="col-lg-8 col-md-10 col-sm-12">
+        <div class="bg-white rounded-3 p-4 shadow-lg">
+            <div class="row">
+                <div class="col">
+                    <h1>Work In Progress</h1>
+                </div>
+                <div class="row">
+                    <div class="col d-flex">
+                        <input type="text" placeholder="Ingresa el código" name="search" class="form-control rounded-start">
+                        <button type="submit" class="btn btn-outline-light bg-primary rounded-end" @onclick="GetWIP">
+                            <i class="fa fa-search">
+                                <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.25 19.25L15.5 15.5M4.75 11C4.75 7.54822 7.54822 4.75 11 4.75C14.4518 4.75 17.25 7.54822 17.25 11C17.25 14.4518 14.4518 17.25 11 17.25C7.54822 17.25 4.75 14.4518 4.75 11Z"></path>
+                                </svg>
+                            </i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    private void GetWIP()
+    {
+        // Aquí puedes agregar la lógica para consultar tu base de datos con el término de búsqueda (searchTerm)
+        // Por ejemplo, podrías usar Entity Framework para consultar una base de datos en C#
+        // Luego, puedes mostrar los resultados en tu página
+    }
+}

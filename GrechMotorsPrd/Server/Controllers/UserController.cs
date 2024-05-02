@@ -1,6 +1,9 @@
 ﻿using GrechMotorsPrd.Server.Data;
 using GrechMotorsPrd.Shared.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,20 +11,30 @@ namespace GrechMotorsPrd.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class UserController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> userManager;
 
-        public UserController(ApplicationDbContext context)
+        public UserController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
 
             _context = context;
+            this.userManager = userManager;
         }
 
         [HttpGet]
         public async Task<ActionResult<List<UserModel>>> GetUser()
         {
             var lista = await _context.users.ToListAsync();
+            return Ok(lista);
+        }
+
+        [HttpGet("roles")]
+        public async Task<ActionResult<List<RolModel>>> GetRoles()
+        {
+            var lista = await _context.Roles.Select(x => new RolModel { roleName = x.Name!}).ToListAsync();
             return Ok(lista);
         }
 
@@ -38,13 +51,56 @@ namespace GrechMotorsPrd.Server.Controllers
             return Ok(miobjeto);
         }
 
+        // GET: api/UnitPieceCode/getUnitPieceByIdentificationCode/{qr_code_number}
+        [HttpGet]
+        [Route("getUserByUserNumber/{userNumber}")]
+        public async Task<ActionResult<List<UserModel>>> GetUserByUserNumber(string userNumber)
+        {
+            var miobjeto = await _context.users.FirstOrDefaultAsync(ob => ob.user_number == userNumber);
+            if (miobjeto == null)
+            {
+                return NotFound(" :/");
+            }
+            return Ok(miobjeto);
+        }
+
         [HttpPost]
         public async Task<ActionResult<UserModel>> CreateUser(UserModel objeto)
         {
+            try
+            {
+                _context.users.Add(objeto);
+                await _context.SaveChangesAsync();
+                return Ok(objeto);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
-            _context.users.Add(objeto);
-            await _context.SaveChangesAsync();
-            return Ok(await GetDbUser());
+        [HttpPost("assignRole")]
+        public async Task<ActionResult<UserModel>> AssignUserRole(EditRolModel objeto)
+        {
+            var user = await userManager.FindByIdAsync(objeto.user_id.ToString());
+            if (user is null)
+            {
+                return BadRequest("The user doesn't exist");
+            }
+            await userManager.AddToRoleAsync(user, objeto.role);
+            return NoContent();
+        }
+
+        [HttpPost("removeRole")]
+        public async Task<ActionResult<UserModel>> RemoveUserRole(EditRolModel objeto)
+        {
+            var user = await userManager.FindByIdAsync(objeto.user_id.ToString());
+            if (user is null)
+            {
+                return BadRequest("The user doesn't exist");
+            }
+            await userManager.RemoveFromRoleAsync(user, objeto.role);
+            return NoContent();
         }
 
         [HttpPut("{id}/username")]
