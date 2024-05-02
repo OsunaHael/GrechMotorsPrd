@@ -5,7 +5,14 @@
                 <div class="col">
                     <div class="nav-item px-2 fs-6">
                         <NavLink class="nav-link" Match="NavLinkMatch.All">
-                             @context.User.Identity.Name
+                             Hola, @context.User.Identity.Name
+                        </NavLink>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="nav-item px-2 fs-6">
+                        <NavLink class="nav-link" href="logout" Match="NavLinkMatch.All">
+                            <span class="oi oi-account-logout" aria-hidden="true"></span> Logout
                         </NavLink>
                     </div>
                 </div>
@@ -19,6 +26,13 @@
                     <div class="nav-item px-2 fs-6">
                         <NavLink class="nav-link" href="login" Match="NavLinkMatch.All">
                             <span class="oi oi-account-login" aria-hidden="true"></span> Login
+                        </NavLink>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="nav-item px-3 fs-4">
+                        <NavLink class="nav-link" href="registry" Match="NavLinkMatch.All">
+                            <span class="oi oi-people" aria-hidden="true"></span> Registro
                         </NavLink>
                     </div>
                 </div>

@@ -1,4 +1,6 @@
 ﻿using GrechMotorsPrd.Client.Helpers;
+using GrechMotorsPrd.Client.Repository;
+using GrechMotorsPrd.Shared.Models;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
 using System.IdentityModel.Tokens.Jwt;
@@ -11,13 +13,15 @@ namespace GrechMotorsPrd.Client.Auth
     {
         private readonly IJSRuntime js;
         private readonly HttpClient httpClient;
-        public static readonly string TOKENKEY = "TOKENKEY"; 
+        private readonly IRepository repository;
+        public static readonly string TOKENKEY = "TOKENKEY";
         private AuthenticationState Anonimo => new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(new ClaimsIdentity())));
 
-        public JwtAuthProvider(IJSRuntime js, HttpClient httpClient)
+        public JwtAuthProvider(IJSRuntime js, HttpClient httpClient, IRepository repository)
         {
             this.js = js;
             this.httpClient = httpClient;
+            this.repository = repository;
         }
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
@@ -43,10 +47,10 @@ namespace GrechMotorsPrd.Client.Auth
             return deserliazedToken.Claims;
         }
 
-        public async Task Login(string token)
+        public async Task Login(UserToken userToken)
         {
-            await js.SaveInLocalStorage(TOKENKEY, token);
-            var authState = BuildAuthenticationState(token);
+            await js.SaveInLocalStorage(TOKENKEY, userToken.Token);
+            var authState = BuildAuthenticationState(userToken.Token);
             NotifyAuthenticationStateChanged(Task.FromResult(authState));
         }
 

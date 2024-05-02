@@ -12,18 +12,6 @@
 @inject QrCodeGenerator qrGenerator
 @inject IJSRuntime JSRuntime
 
-@attribute [Authorize(Roles="Planner, Admin")]
-@* 
-<AuthorizeView Roles="Planner">
-    <Authorized Context="authContext">
-        <h2>Bienvenido, @authContext.User.Identity?.Name</h2>
-    </Authorized>
-    <NotAuthorized>
-        <h1>No estas autorizado para entrar a esta pagina</h1>
-    </NotAuthorized>
-</AuthorizeView>
- *@
-
 <div id="loadingScreen" class="loading-screen" style="display:@(isLoading ? "block" : "none")">
     <div class="loading-spinner"></div>
 </div>
@@ -32,7 +20,6 @@
         <div class="bg-white rounded-3 p-4 shadow-lg">
             <AuthorizeView Roles="Planner, Admin">
                 <Authorized Context="authContext">
-                    <h2>Bienvenido, @authContext.User.Identity?.Name</h2>
                     <h1>Input Data</h1>
                     <div class="m-3">
                         <EditForm Model="newUnit">

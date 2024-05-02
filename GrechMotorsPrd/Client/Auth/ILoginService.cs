@@ -1,8 +1,10 @@
-﻿namespace GrechMotorsPrd.Client.Auth
+﻿using GrechMotorsPrd.Shared.Models;
+
+namespace GrechMotorsPrd.Client.Auth
 {
     public interface ILoginService
     {
-        Task Login(string token);
+        Task Login(UserToken userToken);
         Task Logout();
     }
 }

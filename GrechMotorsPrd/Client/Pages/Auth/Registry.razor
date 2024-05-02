@@ -3,6 +3,7 @@
 @using GrechMotorsPrd.Client.Auth
 @using GrechMotorsPrd.Client.Repository
 @using GrechMotorsPrd.Shared.Models
+@using GrechMotorsPrd.Shared.DTOs
 
 @inject SweetAlertService Swal
 @inject ILoginService loginService
@@ -57,44 +58,8 @@
     </div>
 </div>
 
-@* <EditForm Model="userModel" OnValidSubmit="CreateUser">
-    <DataAnnotationsValidator />
-    <div class="mb-3">
-        <label>Email:</label>
-        <div>
-            <InputText class="form-control" @bind-Value="userModel.email" />
-            <ValidationMessage For="@(() => userModel.email)" />
-        </div>
-    </div>
-
-    <div class="mb-3">
-        <label>Password:</label>
-        <div>
-            <InputText type="password" class="form-control" @bind-Value="userModel.pwd" />
-            <ValidationMessage For="@(() => userModel.pwd)" />
-        </div>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Registrar</button>
-</EditForm> *@
-
 @code {
     private UserModel userModel = new UserModel();
-
-    // private async Task CreateUser()
-    // {
-    //     var httpResponse = await repository.Post<UserModel, UserToken>("api/Account/create", userModel);
-    //     if(httpResponse.Error)
-    //     {
-    //         var errorMessage = await httpResponse.GetErrorMessage();
-    //         await Swal.FireAsync("Error", errorMessage, SweetAlertIcon.Error);
-    //     }
-    //     else
-    //     {
-    //         await loginService.Login(httpResponse.Response!.Token);
-    //         navigationManager.NavigateTo("");
-    //     }
-    // }
 
     private async Task CreateUser()
     {
@@ -108,7 +73,7 @@
         {
             var userToken = httpResponse.Response;
             // Hacer una solicitud GET para obtener el ID del último usuario
-            var httpResponseGetLastUserId = await repository.Get<int>("api/Account/getLastUserId");
+            var httpResponseGetLastUserId = await repository.Get<UserDto>("api/Account/getLastUserId");
 
             if (httpResponseGetLastUserId.Error)
             {
@@ -117,8 +82,9 @@
             }
             else
             {
-                var userId = httpResponseGetLastUserId.Response;
-                userModel.identityUserId = userId;
+                var userDto = httpResponseGetLastUserId.Response;
+                userModel.identityUserId = userDto.Id;
+                userModel.pwd = userDto.PasswordHash;
                 var httpResponseUser = await repository.Post<UserModel>("api/User", userModel);
                 if (httpResponseUser.Error)
                 {
@@ -130,17 +96,17 @@
                     // Comprobar si userToken es null antes de acceder a su propiedad Token
                     if (userToken?.Token != null)
                     {
-                        await loginService.Login(userToken.Token);
+                        await loginService.Login(httpResponse.Response!);
+                        navigationManager.NavigateTo("login");
                     }
                     else
                     {
                         // Manejar el caso en que userToken es null
                         await Swal.FireAsync("Error", "Hubo un error inesperado, para pedir ayuda vaya a la sección de Ayuda", SweetAlertIcon.Error);
                     }
-                    navigationManager.NavigateTo("");
+                    
                 }
             }
         }
     }
-
 }

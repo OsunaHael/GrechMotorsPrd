@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using GrechMotorsPrd.Shared.DTOs;
 
 namespace GrechMotorsPrd.Server.Controllers
 {
@@ -30,19 +31,28 @@ namespace GrechMotorsPrd.Server.Controllers
             this._context = _context;
         }
 
-        // GET: api/Account/getLastUserId
         [HttpGet]
         [Route("getLastUserId")]
-        public async Task<ActionResult<int>> GetLastUserId()
+        public async Task<ActionResult<UserDto>> GetLastUserId()
         {
             var lastUser = await userManager.Users.OrderByDescending(u => u.Id).FirstOrDefaultAsync();
             if (lastUser == null)
             {
                 return NotFound("No users found.");
             }
-            return Ok(lastUser.Id);
+            return Ok(new UserDto { Id = lastUser.Id, PasswordHash = lastUser.PasswordHash });
         }
 
+        [HttpGet("renovateToken")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<UserToken>> RenovateToken()
+        {
+            var userInfo = new UserModel
+            {
+                username = HttpContext.User.Identity!.Name!
+            };
+            return await BuildToken(userInfo);
+        }
 
         [HttpPost("create")]
         public async Task<ActionResult<UserToken>> CreateUser([FromBody] UserModel userModel)
@@ -62,7 +72,8 @@ namespace GrechMotorsPrd.Server.Controllers
         [HttpPost("Login")]
         public async Task<ActionResult<UserToken>> Login([FromBody] UserModel userModel)
         {
-            var result = await signInManager.PasswordSignInAsync(userModel.email!, userModel.pwd!, isPersistent: false, lockoutOnFailure: false);
+            var user = await userManager.FindByEmailAsync(userModel.email!);
+            var result = await signInManager.PasswordSignInAsync(user.UserName!, userModel.pwd!, isPersistent: false, lockoutOnFailure: false);
             if (result.Succeeded)
             {
                 return await BuildToken(userModel);
@@ -75,14 +86,13 @@ namespace GrechMotorsPrd.Server.Controllers
 
         private async Task<UserToken> BuildToken(UserModel userModel)
         {
-            var claims = new List<Claim>()
-            {
-                new Claim(ClaimTypes.Email, userModel.email!),
-                new Claim(ClaimTypes.Name, userModel.username!),
-            };
-
             var user = await userManager.FindByEmailAsync(userModel.email!);
             var roles = await userManager.GetRolesAsync(user!);
+            var claims = new List<Claim>()
+            {
+                new Claim(ClaimTypes.Email, user.Email!),
+                new Claim(ClaimTypes.Name, user.UserName!)
+            };
             
             foreach (var rol in roles)
             {
