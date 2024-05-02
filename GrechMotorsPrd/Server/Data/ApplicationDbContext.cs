@@ -1,11 +1,13 @@
 ﻿// Importamos los modelos necesarios y el espacio de nombres de Entity Framework Core
 using GrechMotorsPrd.Shared.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace GrechMotorsPrd.Server.Data
 {
     // Definición de la clase ApplicationDbContext que hereda de DbContext
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole<int>, int>
     {
         // Constructor que acepta DbContextOptions y lo pasa al constructor base
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
@@ -133,7 +135,7 @@ namespace GrechMotorsPrd.Server.Data
                 .HasOne(psh => psh.Piece) // Una relación historial de estado de pieza tiene una pieza
                 .WithMany(p => p.PieceStatusHistories) // Una pieza tiene muchos historiales de estado de pieza
                 .HasForeignKey(psh => psh.piece_id); // Clave foránea de pieza es piece_id
-            
+
             modelBuilder.Entity<PieceStatusHistory>()
                 .HasOne(psh => psh.Furniture) // Una relación historial de estado de pieza tiene un mueble
                 .WithMany(f => f.PieceStatusHistories) // Un mueble tiene muchos historiales de estado de pieza

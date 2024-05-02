@@ -5,6 +5,7 @@
 @using System.Collections.Concurrent
 @using QRCoder
 @using ImageSharp = SixLabors.ImageSharp.Image
+@using Microsoft.AspNetCore.Authorization;
 
 @inject HttpClient Http
 @inject SweetAlertService swal
@@ -17,105 +18,112 @@
 <div class="container vh-100 d-flex justify-content-center align-items-center mb-3">
     <div class="col-lg-8 col-md-10 col-sm-12">
         <div class="bg-white rounded-3 p-4 shadow-lg">
-            <h1>Input Data</h1>
-            <div class="m-3">
-                <EditForm Model="newUnit">
-                    <div class="row m-3">
-                        <div class="col">
-                            <label for="gNumber" class="form-label">G Number</label>
-                            <InputNumber @bind-Value="newUnit.g_number" id="gNumber" class="form-control" placeholder="G_Number" aria-label="G_Number"></InputNumber>
-                        </div>
-                        <div class="col">
-                            <label for="Modelo" class="form-label">Modelo / Model</label>
-                            <InputSelect @bind-Value="newUnit.model" id="Modelo" class="form-select">
-                                <option value="null" selected></option>
-                                <option value="Tour_144">Tour 144</option>
-                                <option value="Tour_170">Tour 170</option>
-                                <option value="Lounge_170">Lounge 170</option>
-                            </InputSelect>
-                        </div>
-                    </div>
-                    <div class="row m-3">
-                        <div class="col">
-                            <label for="Color" class="form-label">Color</label>
-                            <InputSelect @bind-Value="newUnit.color" id="Color" class="form-select">
-                                <option value="null" selected></option>
-                                <option value="Claro">Claro</option>
-                                <option value="Oscuro">Oscuro</option>
-                            </InputSelect>
-                        </div>
-                        <div class="col">
-                            <label for="Opcion" class="form-label">Opcion / Option</label>
-                            <InputSelect @bind-Value="newUnit.opt" id="Opcion" class="form-select">
-                                <option value="null" selected>Selecciona una opción</option>
-                                @if(newUnit.model == "Lounge_170")
-                                {
-                                    <option value="Estandar" selected>Estandar</option>
-                                }
-                                else if(newUnit.model == "Tour_170" || newUnit.model == "Tour_144")
-                                {
-                                    <option value="Estandar">Estandar</option>
-                                    <option value="Twin Bed">Twin Bed</option>
-                                }
-                            </InputSelect>
-                        </div>
-                    </div>
-                    <div class="row m-3">
-                        <div class="col">
-                            <label for="Ext" class="form-label">Extendida / Extended</label>
-                            <InputSelect @bind-Value="newUnit.ext" id="Ext" class="form-select">
-                                <option value="null" selected></option>
-                                @if((newUnit.model == "Tour_170" && newUnit.opt == "Twin Bed") || newUnit.model == "Tour_144" || (newUnit.model == "Tour_144" && newUnit.opt == "Twin Bed"))
-                                {
-                                    <option value="0" selected>No</option>                                    
-                                }
-                                else if((newUnit.model == "Tour_170" && newUnit.opt == "Estandar") || newUnit.model == "Lounge_170")
-                                {
-                                    <option value="1">Si</option>
-                                    <option value="0">No</option>
-                                }
-                            </InputSelect>
-                        </div>
-                        <div class="col">
-                            <label for="fechaCorte" class="form-label">Fecha de Corte / Cut Off Date</label>
-                            <InputDate @bind-Value="newUnit.cut_off_date" id="fechaCorte" class="form-control" />
-                        </div>
-                    </div>
-                    <div class="row m-3">
-                        <div class="col">
-                            <label for="Linea" class="form-label">Linea / Line</label>
-                            <InputSelect @bind-Value="newUnit.line" id="Linea" class="form-select">
-                                <option value="null" selected></option>
-                                <option value="1">RV 1</option>
-                                <option value="2">RV 2</option>
-                                @* <option value="3">Linea A</option>
-                                <option value="4">Linea B</option> *@
-                            </InputSelect>
-                        </div>
-                        <div class="col">
-                            <label for="userid" class="form-label">User ID</label>
-                            <InputNumber @bind-Value="newUnit.user_id" id="userid" class="form-control" placeholder="User ID" aria-label="UserId"></InputNumber>
-                        </div>
-                        <div class="col d-flex justify-content-start py-3 mt-3">
-                            <button class="btn btn-primary" @onclick="(() => CreateUnit(newUnit))">Crear Unidad</button>
-                        </div>                        
-                    </div>
-                    <div class="row m-3">
-                        @if (showFurnitureDownloadButton)
-                        {
-                            <div class="col d-flex justify-conten-start py-3 mt-3">
-                                <button class="btn btn-success" data-toggle="tooltip" title="Exportar" @onclick="(() => Export(qrFurnitureCodeData, qrFurnitureCodeImageUrl, furnitureFileName))">Descargar QR de Muebles</button>
+            <AuthorizeView Roles="Planner, Admin">
+                <Authorized Context="authContext">
+                    <h1>Input Data</h1>
+                    <div class="m-3">
+                        <EditForm Model="newUnit">
+                            <div class="row m-3">
+                                <div class="col">
+                                    <label for="gNumber" class="form-label">G Number</label>
+                                    <InputNumber @bind-Value="newUnit.g_number" id="gNumber" class="form-control" placeholder="G_Number" aria-label="G_Number"></InputNumber>
+                                </div>
+                                <div class="col">
+                                    <label for="Modelo" class="form-label">Modelo / Model</label>
+                                    <InputSelect @bind-Value="newUnit.model" id="Modelo" class="form-select">
+                                        <option value="null" selected></option>
+                                        <option value="Tour_144">Tour 144</option>
+                                        <option value="Tour_170">Tour 170</option>
+                                        <option value="Lounge_170">Lounge 170</option>
+                                    </InputSelect>
+                                </div>
                             </div>
-                        }
-                        @if (showPieceDownloadButton)
-                        {
-                            <div class="col d-flex justify-conten-start py-3 mt-3">
-                                <button class="btn btn-success" @onclick="(() => Export(qrPieceCodeData, qrPieceCodeImageUrl, pieceFileName))">Descargar QR de Piezas</button>
+                            <div class="row m-3">
+                                <div class="col">
+                                    <label for="Color" class="form-label">Color</label>
+                                    <InputSelect @bind-Value="newUnit.color" id="Color" class="form-select">
+                                        <option value="null" selected></option>
+                                        <option value="Claro">Claro</option>
+                                        <option value="Oscuro">Oscuro</option>
+                                    </InputSelect>
+                                </div>
+                                <div class="col">
+                                    <label for="Opcion" class="form-label">Opcion / Option</label>
+                                    <InputSelect @bind-Value="newUnit.opt" id="Opcion" class="form-select">
+                                        <option value="null" selected>Selecciona una opción</option>
+                                        @if (newUnit.model == "Lounge_170")
+                                        {
+                                            <option value="Estandar" selected>Estandar</option>
+                                        }
+                                        else if (newUnit.model == "Tour_170" || newUnit.model == "Tour_144")
+                                        {
+                                            <option value="Estandar">Estandar</option>
+                                            <option value="Twin Bed">Twin Bed</option>
+                                        }
+                                    </InputSelect>
+                                </div>
                             </div>
-                        }
+                            <div class="row m-3">
+                                <div class="col">
+                                    <label for="Ext" class="form-label">Extendida / Extended</label>
+                                    <InputSelect @bind-Value="newUnit.ext" id="Ext" class="form-select">
+                                        <option value="null" selected></option>
+                                        @if ((newUnit.model == "Tour_170" && newUnit.opt == "Twin Bed") || newUnit.model == "Tour_144" || (newUnit.model == "Tour_144" && newUnit.opt == "Twin Bed"))
+                                        {
+                                            <option value="0" selected>No</option>
+                                        }
+                                        else if ((newUnit.model == "Tour_170" && newUnit.opt == "Estandar") || newUnit.model == "Lounge_170")
+                                        {
+                                            <option value="1">Si</option>
+                                            <option value="0">No</option>
+                                        }
+                                    </InputSelect>
+                                </div>
+                                <div class="col">
+                                    <label for="fechaCorte" class="form-label">Fecha de Corte / Cut Off Date</label>
+                                    <InputDate @bind-Value="newUnit.cut_off_date" id="fechaCorte" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="row m-3">
+                                <div class="col">
+                                    <label for="Linea" class="form-label">Linea / Line</label>
+                                    <InputSelect @bind-Value="newUnit.line" id="Linea" class="form-select">
+                                        <option value="null" selected></option>
+                                        <option value="1">RV 1</option>
+                                        <option value="2">RV 2</option>
+                                        @* <option value="3">Linea A</option>
+                                        <option value="4">Linea B</option> *@
+                                    </InputSelect>
+                                </div>
+                                <div class="col">
+                                    <label for="userid" class="form-label">User ID</label>
+                                    <InputNumber @bind-Value="newUnit.user_id" id="userid" class="form-control" placeholder="User ID" aria-label="UserId"></InputNumber>
+                                </div>
+                                <div class="col d-flex justify-content-start py-3 mt-3">
+                                    <button class="btn btn-primary" @onclick="(() => CreateUnit(newUnit))">Crear Unidad</button>
+                                </div>
+                            </div>
+                            <div class="row m-3">
+                                @if (showFurnitureDownloadButton)
+                                {
+                                    <div class="col d-flex justify-conten-start py-3 mt-3">
+                                        <button class="btn btn-success" data-toggle="tooltip" title="Exportar" @onclick="(() => Export(qrFurnitureCodeData, qrFurnitureCodeImageUrl, furnitureFileName))">Descargar QR de Muebles</button>
+                                    </div>
+                                }
+                                @if (showPieceDownloadButton)
+                                {
+                                    <div class="col d-flex justify-conten-start py-3 mt-3">
+                                        <button class="btn btn-success" @onclick="(() => Export(qrPieceCodeData, qrPieceCodeImageUrl, pieceFileName))">Descargar QR de Piezas</button>
+                                    </div>
+                                }
+                            </div>
+                        </EditForm>
                     </div>
-                </EditForm>
-            </div>
+                </Authorized>
+                <NotAuthorized>
+                    <h1>No estas autorizado para entrar a esta pagina</h1>
+                </NotAuthorized>
+            </AuthorizeView>
         </div>
     </div>
 </div>

@@ -11,7 +11,6 @@
             <div class="row m-3">
                 <div class="row m-1">
                     <div class="col">
-                        @* <label for="QRCode" class="form-label" id="QRCode">Escanea el código QR</label> *@
                         <div class="d-flex">
                             <InputText @bind-Value="qrCode" placeholder="Escanea el Código QR / Scan the QR Code" class="form-control rounded-start"></InputText>
                             @if(qrCode.EndsWith("M"))
@@ -342,6 +341,7 @@
 
     private async Task PiecePass(string pStatus)
     {
+        string swalMessage = String.Empty;
         try
         {
             string pieceStatusUrl = $"api/PieceStatusHistory";
@@ -370,6 +370,14 @@
                         piece_status = pStatus
                     };
                 response = await Http.PostAsJsonAsync(pieceStatusUrl, pieceStatusHistory);
+            }
+            if (pieceFail)
+            {
+                swalMessage = "El reporte de falla ha sido enviado exitosamente";
+            }
+            else
+            {
+                swalMessage = "¡El mueble ha pasado exitosamente!";
             }
             if (response.IsSuccessStatusCode)
             {
@@ -402,6 +410,7 @@
 
     private async Task FurniturePass(string fStatus)
     {
+        string swalMessage = String.Empty;
         try
         {
             string furnitureStatusUrl = $"api/FurnitureStatusHistory";
@@ -430,11 +439,19 @@
                     };
                 response = await Http.PostAsJsonAsync(furnitureStatusUrl, furnitureStatusHistory);
             }
+            if(furnitureFail)
+            {
+                swalMessage = "El reporte de falla ha sido enviado exitosamente";
+            }
+            else
+            {
+                swalMessage = "¡El mueble ha pasado exitosamente!";
+            }
             if (response.IsSuccessStatusCode)
             {
                 await Swal.FireAsync(
                     "Success",
-                    "¡El mueble ha pasado exitosamente!",
+                    swalMessage,
                     SweetAlertIcon.Success
                 );
                 await Swal.CloseAsync();

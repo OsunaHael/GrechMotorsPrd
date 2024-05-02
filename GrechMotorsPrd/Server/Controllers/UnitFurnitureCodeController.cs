@@ -1,5 +1,7 @@
 ﻿using GrechMotorsPrd.Server.Data;
 using GrechMotorsPrd.Shared.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +10,7 @@ namespace GrechMotorsPrd.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class UnitFurnitureCodeController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
