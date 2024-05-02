@@ -10,8 +10,6 @@
 @inject IRepository repository
 @inject NavigationManager navigationManager
 
-<h3>Registry</h3>
-
 <div class="container vh-100 d-flex justify-content-center align-items-center mb-3">
     <div class="col-lg-8 col-md-10 col-sm-12">
         <div class="bg-white rounded-3 p-4 shadow-lg">
@@ -21,8 +19,8 @@
                     <DataAnnotationsValidator />
                     <div class="row m-3">
                         <div class="col">
-                            <label>Nombre:</label>
-                            <InputText class="form-control" @bind-Value="userModel.username"></InputText>
+                            <label>Nombre de Usuario:</label>
+                            <InputText class="form-control" @bind-Value="userModel.username" placeholder="Ingresa un nombre sin espacios"></InputText>
                             <ValidationMessage For="@(() => userModel.username)"></ValidationMessage>
                         </div>
                         <div class="col">
