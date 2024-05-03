@@ -1,6 +1,7 @@
 ﻿@page "/inputdata"
 
 @using GrechMotorsPrd.Shared.Models
+@using Microsoft.AspNetCore.Identity
 @using Newtonsoft.Json;
 @using System.Collections.Concurrent
 @using QRCoder
@@ -11,6 +12,9 @@
 @inject SweetAlertService swal
 @inject QrCodeGenerator qrGenerator
 @inject IJSRuntime JSRuntime
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserManager<ApplicationUser> UserManager
+
 
 <div id="loadingScreen" class="loading-screen" style="display:@(isLoading ? "block" : "none")">
     <div class="loading-spinner"></div>
@@ -95,10 +99,10 @@
                                         <option value="4">Linea B</option> *@
                                     </InputSelect>
                                 </div>
-                                <div class="col">
+                                @* <div class="col">
                                     <label for="userid" class="form-label">User ID</label>
                                     <InputNumber @bind-Value="newUnit.user_id" id="userid" class="form-control" placeholder="User ID" aria-label="UserId"></InputNumber>
-                                </div>
+                                </div> *@
                                 <div class="col d-flex justify-content-start py-3 mt-3">
                                     <button class="btn btn-primary" @onclick="(() => CreateUnit(newUnit))">Crear Unidad</button>
                                 </div>
@@ -109,13 +113,13 @@
                                     <div class="col d-flex justify-conten-start py-3 mt-3">
                                         <button class="btn btn-success" data-toggle="tooltip" title="Exportar" @onclick="(() => Export(qrFurnitureCodeData, qrFurnitureCodeImageUrl, furnitureFileName))">Descargar QR de Muebles</button>
                                     </div>
-                                }
+                                }@* 
                                 @if (showPieceDownloadButton)
                                 {
                                     <div class="col d-flex justify-conten-start py-3 mt-3">
                                         <button class="btn btn-success" @onclick="(() => Export(qrPieceCodeData, qrPieceCodeImageUrl, pieceFileName))">Descargar QR de Piezas</button>
                                     </div>
-                                }
+                                } *@
                             </div>
                         </EditForm>
                     </div>
@@ -135,21 +139,21 @@
     List<FurnitureModel> furnituresM = new List<FurnitureModel>();
     List<PieceModel> piecesM = new List<PieceModel>();
     List<UnitFurnitureCodeModel> unitFurnitureCodes = new List<UnitFurnitureCodeModel>();
-    List<UnitPieceCodeModel> unitPieceCodes = new List<UnitPieceCodeModel>();
+    //List<UnitPieceCodeModel> unitPieceCodes = new List<UnitPieceCodeModel>();
     UnitModel newUnit = new UnitModel();
 
     Queue<string> qrFurnitureCodeData = new Queue<string>();
-    Queue<string> qrPieceCodeData = new Queue<string>();
+    //Queue<string> qrPieceCodeData = new Queue<string>();
     Queue<KeyValuePair<string, ImageSharp>> qrFurnitureCodeImage = new Queue<KeyValuePair<string, ImageSharp>>();
-    Queue<KeyValuePair<string, ImageSharp>> qrPieceCodeImage = new Queue<KeyValuePair<string, ImageSharp>>();
+    //Queue<KeyValuePair<string, ImageSharp>> qrPieceCodeImage = new Queue<KeyValuePair<string, ImageSharp>>();
     Queue<string> qrFurnitureCodeImageUrl = new Queue<string>();
-    Queue<string> qrPieceCodeImageUrl = new Queue<string>();
+    //Queue<string> qrPieceCodeImageUrl = new Queue<string>();
 
     string furnitureFileName = "";
-    string pieceFileName = "";
+    //string pieceFileName = "";
 
     bool showFurnitureDownloadButton = false;
-    bool showPieceDownloadButton = false;
+    //bool showPieceDownloadButton = false;
     private bool isLoading = false;
 
     private async Task CreateUnit(UnitModel myUnit)
@@ -165,8 +169,17 @@
             // Muestra la pantalla de carga
             isLoading = true;
             StateHasChanged();
-            var resultCreateModel = await Http.PostAsJsonAsync("api/Unit", myUnit);
+            
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
 
+            if (user.Identity!.IsAuthenticated)
+            {
+                var applicationUser = await UserManager.GetUserAsync(user);
+                newUnit.user_id = applicationUser!.Id; // Ahora el ID del usuario es un int
+            }
+
+            var resultCreateModel = await Http.PostAsJsonAsync("api/Unit", myUnit);
             if (resultCreateModel.IsSuccessStatusCode)
             {
                 var createdUnit = await resultCreateModel.Content.ReadFromJsonAsync<UnitModel>();
@@ -190,15 +203,15 @@
                     furnituresM = (await Task.WhenAll(furnitureModelsTasks)).ToList();
 
                     var furnitureCodes = await GenerateFurnitureCodes(createdUnit, furnituresM);
-                    var pieceCodes = await GeneratePieceCodes(createdUnit, furnituresM, piecesM, piecesIds);
+                    //var pieceCodes = await GeneratePieceCodes(createdUnit, furnituresM, piecesM, piecesIds);
 
                     await AddFurnitureCodes(furnitureCodes, furnituresM, createdUnit);
-                    await AddPieceCodes(pieceCodes, furnituresM, piecesM, createdUnit, furniturePieces);
+                    //await AddPieceCodes(pieceCodes, furnituresM, piecesM, createdUnit, furniturePieces);
                     
                     isLoading = false;
                     StateHasChanged();
                     showFurnitureDownloadButton = true;
-                    showPieceDownloadButton = true;
+                    //showPieceDownloadButton = true;
                 }
             }
 
@@ -375,42 +388,42 @@
         }
     }
 
-    private async Task<Queue<string>> GeneratePieceCodes(UnitModel unit, List<FurnitureModel> furnituresM, List<PieceModel> piecesM, List<List<int>> piecesIds)
-    {
-        try
-        {
-            var identificationCodes = new Queue<string>();
-            var qrPieceCodeImageData = new Queue<KeyValuePair<string, ImageSharp>>();
+    // private async Task<Queue<string>> GeneratePieceCodes(UnitModel unit, List<FurnitureModel> furnituresM, List<PieceModel> piecesM, List<List<int>> piecesIds)
+    // {
+    //     try
+    //     {
+    //         var identificationCodes = new Queue<string>();
+    //         var qrPieceCodeImageData = new Queue<KeyValuePair<string, ImageSharp>>();
 
-            for (int i = 0; i < furnituresM.Count; i++)
-            {
-                var furniture = furnituresM[i];
-                var relatedPieceIds = piecesIds[i];
+    //         for (int i = 0; i < furnituresM.Count; i++)
+    //         {
+    //             var furniture = furnituresM[i];
+    //             var relatedPieceIds = piecesIds[i];
 
-                foreach (var id in relatedPieceIds)
-                {
-                    var piece = piecesM.First(piece => piece.id == id);
-                    var identificationCode = $"{unit.cut_off_date.ToString("ddMMyy")}{unit.line}{furniture.furniture_number}{piece.piece_number}P";
-                    identificationCodes.Enqueue(identificationCode);
-                    qrPieceCodeImage.Enqueue(qrGenerator.GenerateQrCode(identificationCode));
-                }
-            }
-            qrPieceCodeImageData = qrPieceCodeImage;
-            foreach (var data in qrPieceCodeImageData)
-            {
-                qrPieceCodeData.Enqueue(data.Key);
-            }
-            qrPieceCodeImageUrl = qrGenerator.ImagesToDataUrls(qrPieceCodeImage);
-            pieceFileName = $"Unidad_{unit.model}_{unit.cut_off_date.ToString("ddMMyy")}_PieceCodes";
-            return identificationCodes;
-        }
-        catch (Exception ex)
-        {
-            // Handle exceptions
-            Console.WriteLine($"An error occurred: {ex.Message}");
-            throw new Exception("An error occurred while generating the piece codes.", ex);
-        }
-    }
+    //             foreach (var id in relatedPieceIds)
+    //             {
+    //                 var piece = piecesM.First(piece => piece.id == id);
+    //                 var identificationCode = $"{unit.cut_off_date.ToString("ddMMyy")}{unit.line}{furniture.furniture_number}{piece.piece_number}P";
+    //                 identificationCodes.Enqueue(identificationCode);
+    //                 qrPieceCodeImage.Enqueue(qrGenerator.GenerateQrCode(identificationCode));
+    //             }
+    //         }
+    //         qrPieceCodeImageData = qrPieceCodeImage;
+    //         foreach (var data in qrPieceCodeImageData)
+    //         {
+    //             qrPieceCodeData.Enqueue(data.Key);
+    //         }
+    //         qrPieceCodeImageUrl = qrGenerator.ImagesToDataUrls(qrPieceCodeImage);
+    //         pieceFileName = $"Unidad_{unit.model}_{unit.cut_off_date.ToString("ddMMyy")}_PieceCodes";
+    //         return identificationCodes;
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         // Handle exceptions
+    //         Console.WriteLine($"An error occurred: {ex.Message}");
+    //         throw new Exception("An error occurred while generating the piece codes.", ex);
+    //     }
+    // }
 
     async Task Export(Queue<string> qrInfo, Queue<string> imageUrls, string fileName)
     {
@@ -453,53 +466,53 @@
         }
     }
 
-    private async Task AddPieceCodes(Queue<string> pieceCodes, List<FurnitureModel> furnitureM, List<PieceModel> pieceM, UnitModel unit, List<FurniturePieceModel> furniturePieces)
-    {
-        try
-        {
-            var tasks = new List<Task<HttpResponseMessage>>();
+    // private async Task AddPieceCodes(Queue<string> pieceCodes, List<FurnitureModel> furnitureM, List<PieceModel> pieceM, UnitModel unit, List<FurniturePieceModel> furniturePieces)
+    // {
+    //     try
+    //     {
+    //         var tasks = new List<Task<HttpResponseMessage>>();
 
-            foreach (var furniture in furnitureM)
-            {
-                var correspondingPieceIds = furniturePieces.Where(fp => fp.furniture_id == furniture.id).Select(fp => fp.piece_id);
-                var correspondingPieces = correspondingPieceIds.Select(id => pieceM.First(piece => piece.id == id));
+    //         foreach (var furniture in furnitureM)
+    //         {
+    //             var correspondingPieceIds = furniturePieces.Where(fp => fp.furniture_id == furniture.id).Select(fp => fp.piece_id);
+    //             var correspondingPieces = correspondingPieceIds.Select(id => pieceM.First(piece => piece.id == id));
 
 
-                var pieceTasks = correspondingPieces.Select(piece =>
-                {
-                    if (pieceCodes.Count > 0)
-                    {
-                        var unitPieceCode = new UnitPieceCodeModel
-                            {
-                                unit_id = unit.id,
-                                piece_id = piece.id,
-                                furniture_id = furniture.id,
-                                qr_code_number = pieceCodes.Peek() // Usa Peek() en lugar de Dequeue()
-                            };
+    //             var pieceTasks = correspondingPieces.Select(piece =>
+    //             {
+    //                 if (pieceCodes.Count > 0)
+    //                 {
+    //                     var unitPieceCode = new UnitPieceCodeModel
+    //                         {
+    //                             unit_id = unit.id,
+    //                             piece_id = piece.id,
+    //                             furniture_id = furniture.id,
+    //                             qr_code_number = pieceCodes.Peek() // Usa Peek() en lugar de Dequeue()
+    //                         };
 
-                        // Desencola el código después de usarlo
-                        pieceCodes.Dequeue();
+    //                     // Desencola el código después de usarlo
+    //                     pieceCodes.Dequeue();
 
-                        return Http.PostAsJsonAsync("api/UnitPieceCode", unitPieceCode);
-                    }
-                    else
-                    {
-                        return null;
-                    }
-                }).Where(task => task != null);
+    //                     return Http.PostAsJsonAsync("api/UnitPieceCode", unitPieceCode);
+    //                 }
+    //                 else
+    //                 {
+    //                     return null;
+    //                 }
+    //             }).Where(task => task != null);
 
-                tasks.AddRange(pieceTasks);
-            }
+    //             tasks.AddRange(pieceTasks);
+    //         }
 
-            var responses = await Task.WhenAll(tasks);
-        }
-        catch (Exception ex)
-        {
-            // Handle exceptions
-            Console.WriteLine($"An error occurred: {ex.Message}");
-            throw new Exception("An error occurred while adding the piece codes.", ex);
-        }
-    }
+    //         var responses = await Task.WhenAll(tasks);
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         // Handle exceptions
+    //         Console.WriteLine($"An error occurred: {ex.Message}");
+    //         throw new Exception("An error occurred while adding the piece codes.", ex);
+    //     }
+    // }
 
     private async Task DownloadFile(string fileName)
     {
