@@ -51,6 +51,17 @@ namespace GrechMotorsPrd.Server.Controllers
             return Ok(miobjeto);
         }
 
+        [HttpGet("id")]
+        public async Task<ActionResult<int>> GetUserId()
+        {
+            var user = await userManager.GetUserAsync(User);
+            if (user is null)
+            {
+                return Unauthorized();
+            }
+            return user.Id;
+        }
+
         // GET: api/UnitPieceCode/getUnitPieceByIdentificationCode/{qr_code_number}
         [HttpGet]
         [Route("getUserByUserNumber/{userNumber}")]
