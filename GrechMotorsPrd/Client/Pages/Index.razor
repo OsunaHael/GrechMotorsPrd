@@ -53,9 +53,18 @@
                         <div class="col">
                             <p>G Number: @unit.g_number</p>
                             <p>Modelo / Unit Model: @unit.model</p>
+                            <p>Opcion / Option: @unit.opt</p>
+                            @if(unit.ext == 1)
+                            {
+                                <p>Extendida: Si</p>
+                            }
+                            else if(unit.ext == 0)
+                            {
+                                <p>Extendida: No</p>
+                            }
                             <p>Número de mueble / Furniture Number: @furniture.furniture_number</p>
                             <p>Descripción / Description: @furniture.description</p>
-                            <p>Opcion / Option: @unit.opt</p>
+                            <p>Cantidad de Piezas: @furniture.pieces_quantity.ToString()</p>
                             <p>Color: @unit.color</p>
                         </div>
                     </div>
