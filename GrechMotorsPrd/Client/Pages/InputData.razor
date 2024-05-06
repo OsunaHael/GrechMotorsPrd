@@ -13,7 +13,7 @@
 @inject QrCodeGenerator qrGenerator
 @inject IJSRuntime JSRuntime
 @inject AuthenticationStateProvider AuthenticationStateProvider
-@inject UserManager<ApplicationUser> UserManager
+@* @inject UserManager<ApplicationUser> UserManager *@
 
 
 <div id="loadingScreen" class="loading-screen" style="display:@(isLoading ? "block" : "none")">
@@ -135,9 +135,9 @@
 @code 
 {
     HashSet<int> furnitureIds = new HashSet<int>();
-    List<List<int>> piecesIds = new List<List<int>>();
+    // List<List<int>> piecesIds = new List<List<int>>();
     List<FurnitureModel> furnituresM = new List<FurnitureModel>();
-    List<PieceModel> piecesM = new List<PieceModel>();
+    // List<PieceModel> piecesM = new List<PieceModel>();
     List<UnitFurnitureCodeModel> unitFurnitureCodes = new List<UnitFurnitureCodeModel>();
     //List<UnitPieceCodeModel> unitPieceCodes = new List<UnitPieceCodeModel>();
     UnitModel newUnit = new UnitModel();
@@ -169,15 +169,8 @@
             // Muestra la pantalla de carga
             isLoading = true;
             StateHasChanged();
-            
-            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-            var user = authState.User;
 
-            if (user.Identity!.IsAuthenticated)
-            {
-                var applicationUser = await UserManager.GetUserAsync(user);
-                newUnit.user_id = applicationUser!.Id; // Ahora el ID del usuario es un int
-            }
+            newUnit.user_id = 2;
 
             var resultCreateModel = await Http.PostAsJsonAsync("api/Unit", myUnit);
             if (resultCreateModel.IsSuccessStatusCode)
@@ -191,13 +184,13 @@
                     var orderedFurnitureIds = unorderedFurnitureIds.OrderBy(id => id);
                     furnitureIds.UnionWith(orderedFurnitureIds);
 
-                    var furniturePieces = await GetAsyncList<FurniturePieceModel>("api/FurniturePiece");
+                    // var furniturePieces = await GetAsyncList<FurniturePieceModel>("api/FurniturePiece");
 
-                    var furniturePiecesTasks = furnitureIds.Select(id => GetAsyncList<int>($"api/FurniturePiece/getPiecesByFurnitureId/{id}"));
-                    piecesIds = (await Task.WhenAll(furniturePiecesTasks)).ToList();
+                    // var furniturePiecesTasks = furnitureIds.Select(id => GetAsyncList<int>($"api/FurniturePiece/getPiecesByFurnitureId/{id}"));
+                    // piecesIds = (await Task.WhenAll(furniturePiecesTasks)).ToList();
 
-                    var pieceModelsTasks = piecesIds.SelectMany(id => id).Select(id => GetAsyncJson<PieceModel>($"api/Piece/getPieceById/{id}"));
-                    piecesM = (await Task.WhenAll(pieceModelsTasks)).ToList();
+                    // var pieceModelsTasks = piecesIds.SelectMany(id => id).Select(id => GetAsyncJson<PieceModel>($"api/Piece/getPieceById/{id}"));
+                    // piecesM = (await Task.WhenAll(pieceModelsTasks)).ToList();
 
                     var furnitureModelsTasks = furnitureIds.Select(id => GetAsyncJson<FurnitureModel>($"api/Furniture/getFurnitureById/{id}"));
                     furnituresM = (await Task.WhenAll(furnitureModelsTasks)).ToList();
@@ -207,25 +200,37 @@
 
                     await AddFurnitureCodes(furnitureCodes, furnituresM, createdUnit);
                     //await AddPieceCodes(pieceCodes, furnituresM, piecesM, createdUnit, furniturePieces);
-                    
-                    isLoading = false;
-                    StateHasChanged();
-                    showFurnitureDownloadButton = true;
+
                     //showPieceDownloadButton = true;
                 }
+                await swal.CloseAsync();
+                isLoading = false;
+                StateHasChanged();
+                // Muestra un mensaje de confirmación
+                await swal.FireAsync(
+                    "Success",
+                    "La unidad se creó correctamente",
+                    SweetAlertIcon.Success
+                );
+                await swal.CloseAsync();
+                newUnit = new UnitModel();
+                showFurnitureDownloadButton = true;
+                StateHasChanged();
             }
-
-            await swal.CloseAsync();
-
-            // Muestra un mensaje de confirmación
-            await swal.FireAsync(
-                "Success",
-                "La unidad se creó correctamente",
-                SweetAlertIcon.Success
-            );
-            await swal.CloseAsync();
-            newUnit = new UnitModel();
-            StateHasChanged();
+            else
+            {
+                isLoading = false;
+                StateHasChanged();
+                await swal.CloseAsync();
+                await swal.FireAsync(
+                    "Error",
+                    "Hubo un error al crear la unidad",
+                    SweetAlertIcon.Error
+                );
+                await swal.CloseAsync();
+                newUnit = new UnitModel();
+                StateHasChanged();
+            }
         }
         catch (Exception ex)
         {
@@ -430,7 +435,6 @@
         await JSRuntime.InvokeVoidAsync("GeneratePDF", qrInfo, imageUrls, fileName);
     }
 
-
     private async Task AddFurnitureCodes(Queue<string> furnitureCodes, List<FurnitureModel> furnitureM, UnitModel unit)
     {
         try
@@ -465,7 +469,6 @@
             throw new Exception("An error occurred while adding the furniture codes.", ex);
         }
     }
-
     // private async Task AddPieceCodes(Queue<string> pieceCodes, List<FurnitureModel> furnitureM, List<PieceModel> pieceM, UnitModel unit, List<FurniturePieceModel> furniturePieces)
     // {
     //     try
@@ -512,8 +515,7 @@
     //         Console.WriteLine($"An error occurred: {ex.Message}");
     //         throw new Exception("An error occurred while adding the piece codes.", ex);
     //     }
-    // }
-
+    //     // }
     private async Task DownloadFile(string fileName)
     {
         await JSRuntime.InvokeVoidAsync("downloadFile", fileName);

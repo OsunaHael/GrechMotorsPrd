@@ -10,6 +10,7 @@ namespace GrechMotorsPrd.Shared.Models
     {
         public int id { get; set; }
         public int furniture_number { get; set; }
+        public int pieces_quantity { get; set; }
         public string? furniture_status { get; set; }
         public string? description { get; set; }
         public string? comments { get; set; }
